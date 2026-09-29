@@ -1,0 +1,36 @@
+{
+  "retrieved_at": "2026-09-29T15:27:02+00:00",
+  "osm_relation": 2018203,
+  "license": "Open Database License (ODbL) 1.0 \u2014 \u00a9 OpenStreetMap contributors",
+  "sources": {
+    "boundary": "Nominatim lookup of OSM relation 2018203",
+    "admin_areas": "Overpass API (admin_level 6\u201310 within Wayanad) + Nominatim polygons",
+    "places": "Overpass API place=* nodes within Wayanad",
+    "pois": "Overpass API amenity/emergency/office/waterway/power/tourism/natural/bridge within Wayanad"
+  },
+  "counts": {
+    "admin_areas": 3,
+    "places": 461,
+    "pois": 2553,
+    "pois_by_category": {
+      "peak": 11,
+      "tourism": 29,
+      "school": 543,
+      "religious": 298,
+      "hospital": 211,
+      "government": 400,
+      "police": 25,
+      "college": 89,
+      "weir": 183,
+      "clinic": 58,
+      "dam": 20,
+      "community": 73,
+      "shelter_structure": 379,
+      "emergency_service": 1,
+      "power": 9,
+      "bridge": 221,
+      "fire_station": 3
+    }
+  },
+  "notes": "Completeness reflects OpenStreetMap coverage on the retrieval date. Absent features are not mapped in OSM, not absent on the ground."
+}

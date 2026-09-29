@@ -1,0 +1,6 @@
+{
+  "reviewed_at": "2026-09-29",
+  "review_summary": "Searched for legitimately public, continuously available camera feeds inside Wayanad district (traffic, government, disaster-management, weather and tourism webcams, including Thamarassery Churam / NH-766). None were found. Malayalam news channels occasionally run event-specific YouTube livestreams from the ghat road; these are not continuous public camera feeds and are not listed.",
+  "how_to_add": "Add an object to `cameras` only for a feed you have confirmed is public and permitted to embed. type: 'hls' (m3u8), 'mjpeg', 'image' (periodically refreshed still), or 'youtube_live' (only for a channel's permanent 24/7 live stream). Set `verified_live_at` to when you last confirmed it.",
+  "cameras": []
+}

@@ -1,0 +1,215 @@
+services:
+  postgres:
+    image: postgis/postgis:16-3.4
+    container_name: floodguard-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-floodguard}
+      POSTGRES_USER: ${POSTGRES_USER:-floodguard}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-floodguard_dev_password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/init-sql:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-floodguard} -d ${POSTGRES_DB:-floodguard}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - floodguard-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: floodguard-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - floodguard-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: floodguard-backend
+    environment:
+      - POSTGRES_HOST=postgres
+      - REDIS_HOST=redis
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-floodguard}:${POSTGRES_PASSWORD:-floodguard_dev_password}@postgres:5432/${POSTGRES_DB:-floodguard}
+      - ALEMBIC_DATABASE_URL=postgresql://${POSTGRES_USER:-floodguard}:${POSTGRES_PASSWORD:-floodguard_dev_password}@postgres:5432/${POSTGRES_DB:-floodguard}
+      - REDIS_URL=redis://redis:6379/0
+      - ENVIRONMENT=development
+      - LOG_LEVEL=DEBUG
+      - SECRET_KEY=${SECRET_KEY:-dev_secret_key_change_in_production}
+      - ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - OPEN_METEO_BASE_URL=https://api.open-meteo.com/v1
+      - IMD_API_BASE_URL=${IMD_API_BASE_URL:-}
+      - MOSDAC_API_BASE_URL=${MOSDAC_API_BASE_URL:-}
+      - BHUVAN_API_BASE_URL=${BHUVAN_API_BASE_URL:-}
+      - VAPID_PUBLIC_KEY=${VAPID_PUBLIC_KEY:-}
+      - VAPID_PRIVATE_KEY=${VAPID_PRIVATE_KEY:-}
+      - VAPID_SUBJECT=${VAPID_SUBJECT:-}
+      - EMERGENCY_AUTO_OFFICIAL_ALERTS=${EMERGENCY_AUTO_OFFICIAL_ALERTS:-true}
+    volumes:
+      - ./backend:/app
+      - ./shared:/app/shared
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: >
+      sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --timeout-graceful-shutdown 3"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/api/v1/health/live"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    networks:
+      - floodguard-network
+
+  celery-worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: floodguard-celery-worker
+    environment:
+      - POSTGRES_HOST=postgres
+      - REDIS_HOST=redis
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-floodguard}:${POSTGRES_PASSWORD:-floodguard_dev_password}@postgres:5432/${POSTGRES_DB:-floodguard}
+      - ALEMBIC_DATABASE_URL=postgresql://${POSTGRES_USER:-floodguard}:${POSTGRES_PASSWORD:-floodguard_dev_password}@postgres:5432/${POSTGRES_DB:-floodguard}
+      - REDIS_URL=redis://redis:6379/0
+      - ENVIRONMENT=development
+      - LOG_LEVEL=DEBUG
+      - SECRET_KEY=${SECRET_KEY:-dev_secret_key_change_in_production}
+      - VAPID_PUBLIC_KEY=${VAPID_PUBLIC_KEY:-}
+      - VAPID_PRIVATE_KEY=${VAPID_PRIVATE_KEY:-}
+      - VAPID_SUBJECT=${VAPID_SUBJECT:-}
+      - EMERGENCY_AUTO_OFFICIAL_ALERTS=${EMERGENCY_AUTO_OFFICIAL_ALERTS:-true}
+    volumes:
+      - ./backend:/app
+      - ./shared:/app/shared
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: celery -A app.core.celery_app worker --loglevel=info --concurrency=4
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A app.core.celery_app inspect ping -d celery@$$HOSTNAME --timeout 10 | grep -q pong"]
+      interval: 30s
+      timeout: 25s
+      retries: 3
+      start_period: 40s
+    networks:
+      - floodguard-network
+
+  celery-beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: floodguard-celery-beat
+    environment:
+      - POSTGRES_HOST=postgres
+      - REDIS_HOST=redis
+      - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-floodguard}:${POSTGRES_PASSWORD:-floodguard_dev_password}@postgres:5432/${POSTGRES_DB:-floodguard}
+      - ALEMBIC_DATABASE_URL=postgresql://${POSTGRES_USER:-floodguard}:${POSTGRES_PASSWORD:-floodguard_dev_password}@postgres:5432/${POSTGRES_DB:-floodguard}
+      - REDIS_URL=redis://redis:6379/0
+      - ENVIRONMENT=development
+      - LOG_LEVEL=DEBUG
+      - SECRET_KEY=${SECRET_KEY:-dev_secret_key_change_in_production}
+      - VAPID_PUBLIC_KEY=${VAPID_PUBLIC_KEY:-}
+      - VAPID_PRIVATE_KEY=${VAPID_PRIVATE_KEY:-}
+      - VAPID_SUBJECT=${VAPID_SUBJECT:-}
+      - EMERGENCY_AUTO_OFFICIAL_ALERTS=${EMERGENCY_AUTO_OFFICIAL_ALERTS:-true}
+    volumes:
+      - ./backend:/app
+      - ./shared:/app/shared
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: celery -A app.core.celery_app beat --loglevel=info --schedule /tmp/celerybeat-schedule
+    healthcheck:
+      # beat persists its schedule at least every 5 minutes while it is running
+      test: ["CMD-SHELL", "python -c \"import os,time,glob,sys; f=glob.glob('/tmp/celerybeat-schedule*'); sys.exit(0 if f and time.time()-max(os.path.getmtime(x) for x in f) < 900 else 1)\""]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - floodguard-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: development
+    container_name: floodguard-frontend
+    environment:
+      # Same-origin API (/api → backend) so phones and HTTPS tunnels work; vite proxies to the backend service
+      - VITE_API_BASE_URL=/api/v1
+      - VITE_WS_BASE_URL=/api/v1
+      - VITE_PROXY_TARGET=http://backend:8000
+      - VITE_ALLOWED_HOSTS=${VITE_ALLOWED_HOSTS:-}
+      - VITE_MAPTILER_KEY=${MAPTILER_KEY:-}
+      - VITE_MAPBOX_TOKEN=${MAPBOX_TOKEN:-}
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    command: npm run dev -- --host 0.0.0.0 --port 5173
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:5173/manifest.webmanifest > /dev/null"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - floodguard-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: floodguard-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./infrastructure/docker/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./infrastructure/docker/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - frontend
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/api/v1/health/live > /dev/null"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks:
+      - floodguard-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  floodguard-network:
+    driver: bridge

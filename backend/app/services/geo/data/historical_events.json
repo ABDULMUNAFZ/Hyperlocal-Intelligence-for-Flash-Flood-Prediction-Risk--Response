@@ -1,0 +1,64 @@
+{
+  "curated_at": "2026-09-29",
+  "note": "Curated from published sources linked on each event. Marker positions are OpenStreetMap settlement nodes for the named places, not surveyed initiation points or mapped impact extents. Where published casualty figures conflict, no single figure is shown.",
+  "events": [
+    {
+      "id": "wayanad-2024-mundakkai-chooralmala",
+      "title": "Mundakkai–Chooralmala landslides and debris flow",
+      "event_type": "Landslide / debris flow (rainfall-triggered)",
+      "date": "2024-07-30",
+      "time_local": "≈02:17 IST, second slide ≈04:10 IST",
+      "location": "Punchirimattom, Mundakkai, Chooralmala and Vellarimala — Meppadi Grama Panchayat, Vythiri taluk",
+      "rivers": ["Punnappuzha", "Iruvanjippuzha (Chaliyar river system)"],
+      "rainfall_reported": "204.5 mm in the first 24 h and 372.6 mm in the following 24 h (as reported in the source)",
+      "impact": "Several hundred people killed and many missing; published death tolls differ between official releases — see source.",
+      "coordinates": [76.1557245, 11.486475],
+      "position_basis": "OSM node: Mundakai (village)",
+      "related_places": [
+        { "name": "Punchiri Mattam", "coordinates": [76.1516014, 11.4818245] },
+        { "name": "Mundakai", "coordinates": [76.1557245, 11.486475] },
+        { "name": "Chooralmala", "coordinates": [76.1598711, 11.4992319] },
+        { "name": "Vellarimala", "coordinates": [76.1614694, 11.5037231] }
+      ],
+      "sources": [
+        { "label": "Wikipedia — 2024 Wayanad landslides", "url": "https://en.wikipedia.org/wiki/2024_Wayanad_landslides" }
+      ]
+    },
+    {
+      "id": "wayanad-2019-puthumala",
+      "title": "Puthumala landslide",
+      "event_type": "Landslide (rainfall-triggered)",
+      "date": "2019-08-08",
+      "time_local": "≈16:00 IST",
+      "location": "Puthumala, Vellarimala village — Meppadi Grama Panchayat, Vythiri taluk",
+      "rivers": [],
+      "rainfall_reported": "Triggered by ≈244 mm one-day rainfall (NRSC study as cited by source)",
+      "impact": "17 people killed, including 6 whose bodies were not recovered (Onmanorama; Springer chapter).",
+      "coordinates": [76.1406053, 11.5013341],
+      "position_basis": "OSM node: Puthumala (hamlet)",
+      "related_places": [],
+      "sources": [
+        { "label": "Springer — The August 2019 Puthumala Landslide in Kerala, India", "url": "https://link.springer.com/chapter/10.1007/978-981-19-5077-3_1" },
+        { "label": "Onmanorama — Puthumala ground report (2020)", "url": "https://www.onmanorama.com/news/kerala/2020/12/07/wayanad-puthumala-ground-report-local-body-polls.html" },
+        { "label": "Onmanorama — Kavalappara and Puthumala (2019)", "url": "https://www.onmanorama.com/news/kerala/2019/08/20/kavalappara-puthumala-landslide-reasons-trigger.html" }
+      ]
+    },
+    {
+      "id": "kerala-2018-floods-wayanad",
+      "title": "2018 Kerala floods — Wayanad",
+      "event_type": "Regional flood and landslides (district-wide)",
+      "date": "2018-08",
+      "time_local": null,
+      "location": "District-wide (Wayanad was one of the hill districts isolated by landslides)",
+      "rivers": [],
+      "rainfall_reported": "2,676.8 mm vs normal 2,167.2 mm for 1 Jun – 17 Aug 2018 (+23.5%), per the cumulative rainfall table in the source",
+      "impact": "Heavy rains caused severe landslides and left the district isolated (source). No point location — shown at the district centre.",
+      "coordinates": [76.08281, 11.610278],
+      "position_basis": "District-level event; marker placed at OSM node Kalpetta (district headquarters)",
+      "related_places": [],
+      "sources": [
+        { "label": "Wikipedia — 2018 Kerala floods", "url": "https://en.wikipedia.org/wiki/2018_Kerala_floods" }
+      ]
+    }
+  ]
+}

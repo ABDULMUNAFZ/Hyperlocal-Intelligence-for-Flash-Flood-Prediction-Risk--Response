@@ -1,0 +1,24 @@
+{
+  "id": "/emergency",
+  "name": "FloodGuard Emergency — Wayanad",
+  "short_name": "FloodGuard",
+  "description": "Flash-flood emergency alerts, location pinning, rescue requests and evacuation to designated safe locations.",
+  "start_url": "/emergency?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d2b59",
+  "theme_color": "#0d2b59",
+  "lang": "en-IN",
+  "categories": ["utilities", "weather", "navigation"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Emergency", "short_name": "Emergency", "url": "/emergency?source=shortcut", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Command center", "short_name": "Map", "url": "/?source=shortcut", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

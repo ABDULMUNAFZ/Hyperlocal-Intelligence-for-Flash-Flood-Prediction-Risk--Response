@@ -1,0 +1,228 @@
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+.env
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.tox/
+.pytest_cache/
+*.egg
+*.egg-info/
+dist/
+build/
+*.whl
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+dist/
+build/
+.next/
+.cache/
+.parcel-cache/
+.turbo/
+.eslintcache
+
+# Build outputs
+dist/
+build/
+*.log
+*.tsbuildinfo
+
+# OS
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Test coverage
+.coverage
+htmlcov/
+
+# Python packaging
+*.egg-info/
+*.egg
+*.whl
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+
+# Logs
+logs/
+*.log
+
+# Local databases
+*.sqlite
+*.sqlite3
+*.db
+
+# Docker
+docker-compose.override.yml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local/generated model artifacts and caches where appropriate
+backend/models/trained/
+backend/mlruns/
+
+# Node
+node_modules/
+
+# Build outputs
+frontend/dist/
+backend/build/
+
+# Python
+*.pyc
+*.pyo
+*.pyd
+
+# Temporary files
+*.tmp
+*.temp
+
+# Local databases
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+
+# Backup files
+*.bak
+*.backup
+
+# OSX
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Python virtual environments
+venv/
+.venv/
+ENV/
+
+# Test coverage
+.coverage
+htmlcov/
+
+# Python packaging
+*.egg-info/
+*.egg
+*.whl
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local databases
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# Large generated files
+backend/models/trained/
+backend/mlruns/
+frontend/node_modules/
+backend/__pycache__/
+frontend/node_modules/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# Temporary files
+*.tmp
+*.temp
+
+# Local databases
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+
+# ---------------------------------------------------------------------------
+# Local runtime state & secrets (never commit)
+# ---------------------------------------------------------------------------
+# Raw local PostgreSQL data directory (contains database contents)
+data/postgres/
+# Celery beat runtime schedule
+celerybeat-schedule*
+backend/celerybeat-schedule*
+# Local tool/assistant settings
+.claude/
+# Generated caches (rasters, dev credentials) — backend/.cache is also covered by .cache/
+backend/.cache/
+# Private keys / certificates
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+# Vite dev cache
+frontend/.vite/
