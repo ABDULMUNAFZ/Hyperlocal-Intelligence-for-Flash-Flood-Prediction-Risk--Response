@@ -2,7 +2,7 @@
 
 | | URL |
 |---|---|
-| Frontend (Vercel) | https://floodguard.techmavericks.me |
+| Frontend (Vercel) | https://floodguard.techmavericks.me · https://www.techmavericks.me · https://techmavericks.me |
 | Citizen PWA | https://floodguard.techmavericks.me/emergency |
 | Admin / responder console | https://floodguard.techmavericks.me/ → **Responder** (top bar) → **RESCUE PEOPLE** |
 | API (AWS) | https://api.techmavericks.me/api/v1 |
@@ -41,6 +41,12 @@ Browser ──HTTPS──▶ Vercel (React/Vite build, SPA rewrites, PWA headers
   (`s3://floodguard-prod-assets-<account>/models/…`) and fetched by `scripts/fetch_models.py` at
   container start. Geo rasters/OSM are fetched from their public sources on demand and cached on the
   task's ephemeral disk (no large datasets in images).
+* **Geo data cache**: the geo data the backend fetches from public sources (DEM terrain, OSM, SoilGrids,
+  WorldPop, climate, SACHET, simulation results) is published from `backend/.cache/geo` to
+  `s3://…/geo-cache/` (`provision.sh geo-cache`) and copied into every container at start
+  (`scripts/sync_geo_cache.py`), so production starts with the same data as local Docker.
+* **CORS**: `CORS_ORIGINS` = the three frontend domains above; `CORS_ORIGIN_REGEX` = this project's
+  Vercel URLs. A frontend served from any other origin is refused by browsers (shows "BACKEND OFFLINE").
 * **Long simulations** run as background jobs (`POST /geo/simulate/jobs` → poll
   `GET /geo/simulate/jobs/{id}`), so no HTTP request is held open for minutes.
 

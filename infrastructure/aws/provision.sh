@@ -167,6 +167,13 @@ PY
   aws s3 ls "s3://$BUCKET/models/trained/" --recursive | awk '{print "  s3:", $4, $3" bytes"}'
 }
 
+step_geo_cache() {  # publish the locally built geo data cache (public-source data) for container pre-warm
+  log "geo cache → s3://$BUCKET/geo-cache/"
+  local src; src="$(cd "$(dirname "$0")/../../backend/.cache/geo" && pwd)"
+  aws s3 sync "$src" "s3://$BUCKET/geo-cache/" --only-show-errors
+  aws s3 ls "s3://$BUCKET/geo-cache/" --recursive --summarize | tail -2
+}
+
 # ---------------------------------------------------------------------------------------------
 step_roles() {
   log "IAM: task execution role + task role"
@@ -362,6 +369,7 @@ case "${1:-status}" in
   cluster) step_cluster ;;
   alb) step_alb ;;
   alb-https) step_alb_https ;;
+  geo-cache) step_geo_cache ;;
   cdn) step_cdn ;;
   services) step_services ;;
   migrate) run_migrations ;;

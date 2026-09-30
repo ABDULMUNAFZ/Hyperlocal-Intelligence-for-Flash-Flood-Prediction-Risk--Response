@@ -51,7 +51,7 @@
         },
         {
           "name": "CORS_ORIGINS",
-          "value": "[\"${FRONTEND_ORIGIN}\"]"
+          "value": "${CORS_ORIGINS_JSON}"
         },
         {
           "name": "CORS_ORIGIN_REGEX",

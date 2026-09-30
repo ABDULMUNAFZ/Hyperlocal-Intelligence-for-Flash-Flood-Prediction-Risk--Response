@@ -51,7 +51,7 @@
         },
         {
           "name": "CORS_ORIGINS",
-          "value": "[\"${FRONTEND_ORIGIN}\"]"
+          "value": "${CORS_ORIGINS_JSON}"
         },
         {
           "name": "CORS_ORIGIN_REGEX",
@@ -72,6 +72,10 @@
         {
           "name": "SKIP_MODEL_FETCH",
           "value": "1"
+        },
+        {
+          "name": "GEO_CACHE_S3_URI",
+          "value": "s3://${BUCKET}/geo-cache"
         }
       ],
       "secrets": [
