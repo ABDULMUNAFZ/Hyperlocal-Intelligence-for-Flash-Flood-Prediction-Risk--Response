@@ -4,11 +4,11 @@ import { STATUS_STYLE } from './constants';
 import type { Provenance } from '../../types/geo';
 
 export const panel =
-  'bg-white/90 dark:bg-slate-950/85 backdrop-blur-xl border border-slate-200/80 dark:border-white/10 shadow-[0_10px_40px_-12px_rgba(15,23,42,0.35)] text-slate-800 dark:text-slate-100';
+  'bg-[#F6F5F2]/95 dark:bg-[#141518]/95 backdrop-blur-xl border border-[#E6E4DE] dark:border-white/10 shadow-[0_10px_40px_-12px_rgba(20,21,24,0.12)] text-[#141518] dark:text-[#FAF9F6]';
 
 export function StatusBadge({ status, className = '' }: { status: string; className?: string }) {
   return (
-    <span className={`inline-flex items-center gap-1 rounded px-1.5 py-[1px] text-[9.5px] font-semibold tracking-wider ring-1 ring-inset ${STATUS_STYLE[status] ?? STATUS_STYLE.HISTORICAL} ${className}`}>
+    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-[1px] text-[9.5px] font-semibold tracking-wider ring-1 ring-inset ${STATUS_STYLE[status] ?? STATUS_STYLE.HISTORICAL} ${className}`}>
       {status === 'LIVE' && <span className="h-1.5 w-1.5 rounded-full bg-current animate-pulse" />}
       {status}
     </span>
@@ -18,7 +18,7 @@ export function StatusBadge({ status, className = '' }: { status: string; classN
 export function SectionTitle({ children, right }: { children: React.ReactNode; right?: React.ReactNode }) {
   return (
     <div className="flex items-center justify-between mb-2">
-      <h4 className="text-[10.5px] font-semibold tracking-[0.14em] uppercase text-slate-500 dark:text-slate-400">{children}</h4>
+      <h4 className="text-[10.5px] font-semibold tracking-[0.14em] uppercase text-[#6A6D75] dark:text-slate-400">{children}</h4>
       {right}
     </div>
   );
@@ -27,14 +27,14 @@ export function SectionTitle({ children, right }: { children: React.ReactNode; r
 export function KV({ k, v, mono = false, hint }: { k: React.ReactNode; v: React.ReactNode; mono?: boolean; hint?: string }) {
   return (
     <div className="flex items-baseline justify-between gap-3 py-[3px] text-[12.5px]">
-      <span className="text-slate-500 dark:text-slate-400 shrink-0" title={hint}>{k}</span>
-      <span className={`text-right text-slate-900 dark:text-slate-100 ${mono ? 'font-mono text-[12px]' : 'font-medium'}`}>{v}</span>
+      <span className="text-[#6A6D75] dark:text-slate-400 shrink-0" title={hint}>{k}</span>
+      <span className={`text-right text-[#141518] dark:text-slate-100 ${mono ? 'font-mono text-[12px]' : 'font-medium'}`}>{v}</span>
     </div>
   );
 }
 
 export function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  return <div className={`rounded-xl border border-slate-200/80 dark:border-white/10 bg-white/70 dark:bg-white/[0.03] p-3 ${className}`}>{children}</div>;
+  return <div className={`rounded-2xl border border-[#E6E4DE] dark:border-white/10 bg-white dark:bg-white/[0.04] p-3.5 shadow-xs ${className}`}>{children}</div>;
 }
 
 export function Spinner({ label }: { label?: string }) {
@@ -113,17 +113,18 @@ export function Tabs<T extends string>({ tabs, value, onChange }: { tabs: Array<
 }
 
 export function Btn({ children, onClick, tone = 'default', disabled, className = '', title }: {
-  children: React.ReactNode; onClick?: () => void; tone?: 'default' | 'primary' | 'danger' | 'ghost'; disabled?: boolean; className?: string; title?: string;
+  children: React.ReactNode; onClick?: () => void; tone?: 'default' | 'primary' | 'danger' | 'ghost' | 'lavender'; disabled?: boolean; className?: string; title?: string;
 }) {
   const tones = {
-    default: 'bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200',
-    primary: 'bg-sky-600 hover:bg-sky-700 text-white border border-sky-700/40',
+    default: 'bg-white dark:bg-white/5 border border-[#E6E4DE] dark:border-white/10 hover:bg-[#EDEAE3] dark:hover:bg-white/10 text-[#141518] dark:text-slate-200',
+    primary: 'bg-[#141518] hover:bg-[#252830] text-white border border-[#23252A] shadow-xs',
+    lavender: 'bg-[#DDD6EE] hover:bg-[#CEC4E6] text-[#141518] border border-[#C5BAE0] font-semibold',
     danger: 'bg-rose-600 hover:bg-rose-700 text-white border border-rose-700/40',
-    ghost: 'hover:bg-slate-100 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300',
+    ghost: 'hover:bg-[#EDEAE3] dark:hover:bg-white/10 text-[#555861] dark:text-slate-300',
   };
   return (
     <button title={title} disabled={disabled} onClick={onClick}
-      className={`inline-flex items-center justify-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11.5px] font-semibold tracking-wide transition disabled:opacity-40 disabled:cursor-not-allowed ${tones[tone]} ${className}`}>
+      className={`inline-flex items-center justify-center gap-1.5 rounded-full px-3 py-1.5 text-[11.5px] font-semibold tracking-wide transition disabled:opacity-40 disabled:cursor-not-allowed ${tones[tone]} ${className}`}>
       {children}
     </button>
   );

@@ -96,7 +96,7 @@ export function ResponseMode({ me, request, onRequest, onRefresh, alert, onFindS
 
   const run = async (key: string, fn: () => Promise<void>) => {
     setBusy(key); setErr(null); setMsg(null);
-    try { await fn(); } catch (e: any) {
+    try { await fn(); onRefresh(); /* location / status chips reflect the fix just stored */ } catch (e: any) {
       setErr(e?.code ? e.message : apiError(e, 'The request failed. Check your connection and try again, or call 112.'));
     } finally { setBusy(null); }
   };

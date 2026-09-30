@@ -19,6 +19,11 @@ export function RouteSummary({ s }: { s: SafeLocation }) {
       <div className="text-[12.5px] text-slate-700">
         <b>{fmtDistance(s.route.distance_m)}</b> by {s.route.source.includes('foot') ? 'walking route' : 'road'} · ETA <b>{fmtEta(s.route.duration_s)}</b>
         <div className="text-[10.5px] text-slate-500">{s.route.source}</div>
+        {s.route.distance_m > Math.max(3 * s.distance_m, s.distance_m + 2000) && (
+          <div className="mt-1 rounded-lg bg-amber-50 px-2 py-1 text-[11px] font-semibold text-amber-900 ring-1 ring-amber-200">
+            Mapped route is {Math.round(s.route.distance_m / Math.max(s.distance_m, 1))}× the straight-line distance — the path network may be incomplete here (e.g. a river without a mapped footbridge). Use known local paths and follow officials.
+          </div>
+        )}
       </div>
     );
   }

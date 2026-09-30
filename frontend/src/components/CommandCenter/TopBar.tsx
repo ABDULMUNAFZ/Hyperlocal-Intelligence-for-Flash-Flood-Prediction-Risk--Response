@@ -109,19 +109,19 @@ export const TopBar: React.FC<TopBarProps> = ({
 
   return (
     <header className="absolute top-0 left-0 right-0 z-30 pointer-events-auto">
-      {/* 1. Situational Status & Weather Telemetry Bar (Reference Image 1 & 2) */}
-      <div className="mx-3 mt-2 px-3 py-1 rounded-xl bg-slate-950/85 dark:bg-slate-950/90 border border-slate-800/80 backdrop-blur-md text-[11px] font-mono text-slate-300 flex items-center justify-between shadow-md overflow-x-auto select-none">
+      {/* 1. Situational Status & Weather Telemetry Bar (Reference Image 4 Clean Modern Scheme) */}
+      <div className="mx-3 mt-2 px-3 py-1 rounded-xl bg-white/95 dark:bg-slate-950/90 border border-[#E6E4DE] dark:border-slate-800/80 backdrop-blur-md text-[11px] font-mono text-[#141518] dark:text-slate-300 flex items-center justify-between shadow-xs overflow-x-auto select-none">
         <div className="flex items-center gap-3 shrink-0">
-          <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/40 font-bold tracking-wider text-[10px]">
+          <span className="px-2 py-0.5 rounded-full bg-[#DDD6EE] text-[#141518] font-bold tracking-wider text-[10px] border border-[#C5BAE0]">
             STATUS · WARNING
           </span>
-          <div className="flex items-center gap-1.5 text-rose-400 font-semibold">
-            <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
+          <div className="flex items-center gap-1.5 text-rose-700 dark:text-rose-400 font-semibold">
+            <span className="w-2 h-2 rounded-full bg-rose-600 animate-ping" />
             <span>LIVE MONSOON FEED</span>
           </div>
-          <span className="text-slate-500 hidden sm:inline">|</span>
-          <div className="hidden md:flex items-center gap-2 text-slate-300">
-            <span className="text-teal-400 font-semibold">AIR 26.8°C</span>
+          <span className="text-[#A2A4AC] hidden sm:inline">|</span>
+          <div className="hidden md:flex items-center gap-2 text-[#45474E] dark:text-slate-300">
+            <span className="text-violet-700 dark:text-teal-400 font-bold">AIR 26.8°C</span>
             <span>· 91% RH</span>
             <span>· WIND SW 18 km/h (GUST 38)</span>
             <span>· RAIN RATE 48 mm/h</span>
@@ -133,11 +133,12 @@ export const TopBar: React.FC<TopBarProps> = ({
           {/* Circular Radar Dome Toggle */}
           <button
             onClick={onToggleDomeMask}
-            className={`px-2 py-0.5 rounded text-[10px] font-bold border transition-colors flex items-center gap-1 ${
+            className={`px-2 py-0.5 rounded-full text-[10px] font-bold border transition-colors flex items-center gap-1 ${
               showDomeMask
-                ? 'bg-teal-500/20 text-teal-300 border-teal-500/40'
-                : 'bg-slate-900 text-slate-400 border-slate-700'
+                ? 'bg-[#DDD6EE] text-[#141518] border-[#C5BAE0]'
+                : 'bg-slate-100 text-slate-600 border-slate-300 dark:bg-slate-900 dark:text-slate-400 dark:border-slate-700'
             }`}
+
             title="Toggle South India Circular Radar Dome Arena Mask"
           >
             <span>◎ RADAR DOME</span>

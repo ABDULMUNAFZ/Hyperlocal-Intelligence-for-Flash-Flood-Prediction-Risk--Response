@@ -28,6 +28,7 @@ html {
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -414,3 +415,210 @@ body {
 @keyframes fg-alert-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(224, 49, 49, 0.55); } 50% { box-shadow: 0 0 0 14px rgba(224, 49, 49, 0); } }
 .fg-alert-pulse { animation: fg-alert-pulse 1.4s ease-out infinite; }
 @media (prefers-reduced-motion: reduce) { .fg-alert-pulse, .fg-selected-marker span { animation: none; } }
+
+/* ── FloodGuard Topographic & Scientific Command UI ── */
+.topographic-bg {
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(14, 165, 233, 0.04) 0%, transparent 60%),
+    repeating-radial-gradient(circle at 50% 50%, transparent 0, transparent 38px, rgba(255, 255, 255, 0.02) 39px, rgba(255, 255, 255, 0.02) 40px);
+}
+
+.topo-lines-subtle {
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* ── Warm Architectural Stone & Clinical Capsule System (Inspired by Reference UI) ── */
+.bg-editorial-light {
+  background-color: #EBE8E0;
+  color: #23252A;
+}
+
+.light-topo-pattern {
+  background-color: #EBE8E0;
+  background-image: 
+    radial-gradient(circle at 80% 20%, rgba(212, 248, 38, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 20% 80%, rgba(220, 215, 204, 0.45) 0%, transparent 50%),
+    linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+  background-size: auto, auto, 28px 28px, 28px 28px;
+}
+
+.light-contour-lines {
+  background-image: repeating-radial-gradient(circle at 50% 60%, transparent 0, transparent 40px, rgba(0, 0, 0, 0.02) 41px, rgba(0, 0, 0, 0.02) 42px);
+}
+
+.card-capsule-white {
+  background: #FFFFFF;
+  color: #23252A;
+  border: 1px solid #DDD9CE;
+  box-shadow: 0 2px 12px -2px rgba(0, 0, 0, 0.04);
+}
+
+.card-capsule-stone {
+  background: #F4F2EB;
+  color: #23252A;
+  border: 1px solid #DDD9CE;
+}
+
+.badge-lime-accent {
+  background-color: #D4F826;
+  color: #181A1E;
+  font-weight: 700;
+}
+
+.pill-capsule-button {
+  background: #FFFFFF;
+  color: #23252A;
+  border: 1px solid #DDD9CE;
+  border-radius: 9999px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.pill-capsule-button:hover {
+  background: #F8F7F4;
+  border-color: #C8C3B5;
+  transform: translateY(-1px);
+}
+
+.card-lavender {
+  background: #DDD6EE;
+  color: #141518;
+  border: 1px solid rgba(190, 180, 210, 0.4);
+  box-shadow: 0 8px 30px -8px rgba(180, 170, 205, 0.35);
+}
+
+.card-lavender-subtle {
+  background: #EFEBF7;
+  color: #141518;
+  border: 1px solid rgba(215, 206, 235, 0.6);
+}
+
+.card-paper-white {
+  background: #FFFFFF;
+  color: #23252A;
+  border: 1px solid #DDD9CE;
+  box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.05);
+}
+
+.card-paper-stone {
+  background: #EDEAE3;
+  color: #141518;
+  border: 1px solid #DED9D0;
+}
+
+.card-obsidian-dark {
+  background: #141518;
+  color: #FFFFFF;
+  border: 1px solid #23252A;
+  box-shadow: 0 16px 40px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Asymmetric modern cut from 4th reference image */
+.asymmetric-card-top-right {
+  border-radius: 1.5rem 3.5rem 1.5rem 1.5rem;
+}
+
+.asymmetric-card-bottom-left {
+  border-radius: 1.5rem 1.5rem 1.5rem 3.5rem;
+}
+
+.pill-dark-button {
+  background: #141518;
+  color: #FFFFFF;
+  border-radius: 9999px;
+  font-weight: 500;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.pill-dark-button:hover {
+  background: #23262D;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px -4px rgba(20, 21, 24, 0.35);
+}
+
+.pill-lavender-button {
+  background: #DDD6EE;
+  color: #141518;
+  border-radius: 9999px;
+  font-weight: 500;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.pill-lavender-button:hover {
+  background: #CEC4E6;
+  transform: translateY(-1px);
+}
+
+.editorial-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.editorial-tag-dark {
+  background: #141518;
+  color: #FFFFFF;
+}
+
+.editorial-tag-lavender {
+  background: #DDD6EE;
+  color: #141518;
+}
+
+/* Running Marquee Ticker like in 4th reference image */
+.marquee-track {
+  display: flex;
+  overflow: hidden;
+  user-select: none;
+  gap: 2rem;
+  white-space: nowrap;
+}
+.marquee-content {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 2rem;
+  animation: marquee-scroll 35s linear infinite;
+}
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+
+.glass-panel {
+  background: rgba(13, 19, 29, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-panel-glow {
+  background: radial-gradient(120% 120% at 50% 0%, rgba(30, 58, 138, 0.22) 0%, rgba(10, 15, 26, 0.85) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(56, 189, 248, 0.16);
+  box-shadow: 0 12px 36px -8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.glass-card-interactive {
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card-interactive:hover {
+  background: rgba(22, 33, 58, 0.82);
+  border-color: rgba(56, 189, 248, 0.32);
+  box-shadow: 0 14px 34px -10px rgba(14, 165, 233, 0.22);
+  transform: translateY(-2px);
+}
+

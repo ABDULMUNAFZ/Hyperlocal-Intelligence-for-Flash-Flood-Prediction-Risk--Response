@@ -89,7 +89,10 @@ export function Journey({ me, r, onUpdate, onRescue }: { me: MeDTO; r: RescueReq
   const reached = async () => {
     setReachBusy(true); setReachErr(null);
     try {
-      const f = await getFix();
+      // Prefer the live watchPosition fix when it is fresh (instant, same real device GPS); request a
+      // new one-shot fix only if the watch has gone quiet. The server verifies the distance either way.
+      const fresh = fix && Date.now() - new Date(fix.captured_at).getTime() < 20000;
+      const f = fresh ? fix : await getFix();
       onUpdate(await emergencyApi.reached(r.id, f));
     } catch (e: any) {
       setReachErr(e?.code ? e.message : apiError(e, 'Could not confirm arrival.'));

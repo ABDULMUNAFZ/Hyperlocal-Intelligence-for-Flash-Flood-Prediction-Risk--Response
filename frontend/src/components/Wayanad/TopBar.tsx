@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Search, Layers, CloudRain, ShieldAlert, Waves, Bell, Video, Bot, Database, Sun, Moon, Maximize2, Minimize2, Box, Square, Route,
-  Shield, Info, LifeBuoy, Clapperboard, Users,
+  Shield, Info, LifeBuoy, Clapperboard, Users, Menu, Sliders, ChevronDown, X, Github,
 } from 'lucide-react';
+import FloodGuardLogo from '../common/FloodGuardLogo';
 import { SoundControl } from './EmergencyPanels';
 import { panel, StatusBadge } from './ui';
 import type { LngLat, PointWeather } from '../../types/geo';
@@ -61,8 +63,10 @@ export function TopBar(p: Props) {
   const [open, setOpen] = useState(false);
   const [remote, setRemote] = useState<SearchItem[]>([]);
   const [remoteState, setRemoteState] = useState<'idle' | 'loading' | 'done' | 'error'>('idle');
+  const [toolsOpen, setToolsOpen] = useState(false);
   const [fs, setFs] = useState(false);
   const boxRef = useRef<HTMLDivElement>(null);
+  const toolsRef = useRef<HTMLDivElement>(null);
 
   const local = useMemo(() => {
     const s = q.trim().toLowerCase();
@@ -81,7 +85,10 @@ export function TopBar(p: Props) {
   useEffect(() => { setRemote([]); setRemoteState('idle'); }, [q]);
 
   useEffect(() => {
-    const onDoc = (e: MouseEvent) => { if (!boxRef.current?.contains(e.target as Node)) setOpen(false); };
+    const onDoc = (e: MouseEvent) => {
+      if (!boxRef.current?.contains(e.target as Node)) setOpen(false);
+      if (!toolsRef.current?.contains(e.target as Node)) setToolsOpen(false);
+    };
     document.addEventListener('mousedown', onDoc);
     return () => document.removeEventListener('mousedown', onDoc);
   }, []);
@@ -116,7 +123,7 @@ export function TopBar(p: Props) {
 
   const NavBtn = ({ id, icon: Icon, label }: { id: PanelId; icon: any; label: string }) => (
     <button onClick={() => p.onPanel(id)}
-      className={`flex items-center gap-1.5 rounded-md px-2 py-1.5 text-[10.5px] font-semibold tracking-[0.12em] uppercase transition ${p.openPanel === id ? 'bg-sky-600 text-white' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10'}`}>
+      className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10.5px] font-semibold tracking-[0.12em] uppercase transition ${p.openPanel === id ? 'bg-[#141518] text-white shadow-xs' : 'text-[#555861] hover:bg-[#DDD6EE]/60 hover:text-[#141518] dark:text-slate-300 dark:hover:bg-white/10'}`}>
       <Icon className="h-3.5 w-3.5" /><span className="hidden 2xl:inline">{label}</span>
     </button>
   );
@@ -124,42 +131,45 @@ export function TopBar(p: Props) {
   return (
     <div className="pointer-events-none absolute inset-x-0 top-0 z-30 p-2 md:p-3 space-y-1.5">
       <div className={`${panel} pointer-events-auto flex items-center gap-2 rounded-2xl px-2.5 py-2`}>
-        <div className="flex items-center gap-2.5 pr-2 md:pr-3 md:border-r border-slate-200 dark:border-white/10 shrink-0">
-          <div className="relative h-8 w-8 rounded-lg bg-gradient-to-br from-sky-500 to-teal-500 grid place-items-center shadow-inner">
-            <Waves className="h-4 w-4 text-white" />
-          </div>
-          <div className="leading-tight hidden sm:block">
-            <div className="text-[13px] font-extrabold tracking-[0.22em]">FLOODGUARD</div>
-            <div className="text-[9.5px] font-semibold tracking-[0.2em] text-slate-500 dark:text-slate-400">WAYANAD SITUATIONAL AWARENESS</div>
-          </div>
+        <div className="flex items-center gap-2.5 pr-2 md:pr-3 md:border-r border-[#E6E4DE] dark:border-white/10 shrink-0">
+          <Link to="/" className="relative h-8 w-8 rounded-xl bg-[#141518] text-[#D4F826] p-1.5 grid place-items-center shadow-xs border border-[#2B2E37] hover:scale-105 transition-transform" title="Return to FloodGuard Home">
+            <FloodGuardLogo className="h-5 w-auto" variant="citron" />
+          </Link>
+          <Link to="/" className="leading-tight hidden sm:block text-left hover:opacity-85 transition-opacity">
+            <div className="text-[13px] font-extrabold tracking-[0.22em] text-[#141518] dark:text-white flex items-center gap-1.5">
+              <span>FLOODGUARD</span>
+              <span className="px-1.5 py-0.2 rounded-full bg-[#181A1E] text-[#D4F826] text-[8px] font-mono font-bold">3D</span>
+            </div>
+            <div className="text-[9.5px] font-semibold tracking-[0.2em] text-[#6A6D75] dark:text-slate-400">WAYANAD SITUATIONAL AWARENESS</div>
+          </Link>
         </div>
 
         <div ref={boxRef} className="relative flex-1 min-w-0 max-w-md">
-          <div className="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white/80 dark:bg-white/5 px-2.5">
+          <div className="flex items-center gap-2 rounded-full border border-[#E6E4DE] dark:border-white/10 bg-white/90 dark:bg-white/5 px-3 py-0.5">
             <Search className="h-3.5 w-3.5 text-slate-400 shrink-0" />
             <input value={q} onChange={(e) => { setQ(e.target.value); setOpen(true); }} onFocus={() => setOpen(true)}
               onKeyDown={(e) => { if (e.key === 'Enter') { if (local[0]) pick(local[0]); else searchRemote(); } }}
               placeholder="Search Kalpetta, Meppadi, a river, hospital, school…"
-              className="w-full bg-transparent py-1.5 text-[12.5px] outline-none placeholder:text-slate-400" />
+              className="w-full bg-transparent py-1 text-[12px] outline-none placeholder:text-slate-400 text-[#141518] dark:text-white" />
           </div>
           {open && q.trim().length >= 2 && (
-            <div className={`${panel} absolute left-0 right-0 mt-1 max-h-80 overflow-auto rounded-xl p-1`}>
+            <div className={`${panel} absolute left-0 right-0 mt-1 max-h-80 overflow-auto rounded-2xl p-1.5`}>
               {local.map((it) => (
-                <button key={it.id} onClick={() => pick(it)} className="flex w-full items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-left hover:bg-slate-100 dark:hover:bg-white/10">
-                  <span className="truncate text-[12.5px] font-medium">{it.name}</span>
+                <button key={it.id} onClick={() => pick(it)} className="flex w-full items-center justify-between gap-2 rounded-xl px-2.5 py-1.5 text-left hover:bg-[#DDD6EE]/40 dark:hover:bg-white/10">
+                  <span className="truncate text-[12.5px] font-medium text-[#141518] dark:text-white">{it.name}</span>
                   <span className="shrink-0 text-[10px] uppercase tracking-wider text-slate-400">{it.type.replace('_', ' ')}</span>
                 </button>
               ))}
               {remote.map((it) => (
-                <button key={it.id} onClick={() => pick(it)} className="flex w-full flex-col rounded-lg px-2.5 py-1.5 text-left hover:bg-slate-100 dark:hover:bg-white/10">
-                  <span className="truncate text-[12.5px] font-medium">{it.name}</span>
+                <button key={it.id} onClick={() => pick(it)} className="flex w-full flex-col rounded-xl px-2.5 py-1.5 text-left hover:bg-[#DDD6EE]/40 dark:hover:bg-white/10">
+                  <span className="truncate text-[12.5px] font-medium text-[#141518] dark:text-white">{it.name}</span>
                   <span className="truncate text-[10px] text-slate-400">{it.type} · {it.extra}</span>
                 </button>
               ))}
               <div className="px-2.5 py-1.5 text-[10.5px] text-slate-400 flex items-center justify-between">
                 <span>{local.length} local OSM matches{remoteState === 'done' ? ` · ${remote.length} geocoder results` : ''}</span>
                 {remoteState !== 'done' && (
-                  <button onClick={searchRemote} className="font-semibold text-sky-600 hover:underline">
+                  <button onClick={searchRemote} className="font-semibold text-violet-700 hover:underline">
                     {remoteState === 'loading' ? 'Searching…' : remoteState === 'error' ? 'Geocoder unavailable' : 'Search roads & rivers (OSM Nominatim)'}
                   </button>
                 )}
@@ -168,35 +178,116 @@ export function TopBar(p: Props) {
           )}
         </div>
 
-        <nav className="hidden lg:flex items-center gap-0.5">
-          <button onClick={p.onLayers} className={`flex items-center gap-1.5 rounded-md px-2 py-1.5 text-[10.5px] font-semibold tracking-[0.12em] uppercase ${p.layersOpen ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/10'}`}>
-            <Layers className="h-3.5 w-3.5" /><span className="hidden 2xl:inline">Layers</span>
+        <nav className="flex items-center gap-1.5">
+          <button
+            onClick={p.onLayers}
+            className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-semibold tracking-wider uppercase transition shadow-2xs ${
+              p.layersOpen
+                ? 'bg-[#181A1E] text-white'
+                : 'bg-white border border-[#DDD9CE] text-[#33363F] hover:bg-[#F3F1EA] dark:bg-white/5 dark:border-white/10 dark:text-slate-200'
+            }`}
+          >
+            <Layers className="h-3.5 w-3.5 text-[#656872]" />
+            <span className="hidden sm:inline">Layers</span>
           </button>
-          <NavBtn id="weather" icon={CloudRain} label="Weather" />
-          <NavBtn id="risk" icon={ShieldAlert} label="Risk" />
-          <NavBtn id="simulation" icon={Waves} label="Simulation" />
-          <NavBtn id="evacuation" icon={Route} label="Evacuation" />
-          <NavBtn id="alerts" icon={Bell} label="Alerts" />
-          <NavBtn id="cameras" icon={Video} label="Cameras" />
-          <NavBtn id="ai" icon={Bot} label="AI" />
-          <NavBtn id="data" icon={Database} label="Data" />
-          <NavBtn id="admin" icon={Shield} label={p.responder ? 'Command' : 'Responder'} />
-          <NavBtn id="about" icon={Info} label="About" />
+
+          <button
+            onClick={() => p.onPanel('simulation')}
+            className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-semibold tracking-wider uppercase transition shadow-2xs ${
+              p.openPanel === 'simulation'
+                ? 'bg-[#181A1E] text-white'
+                : 'bg-white border border-[#DDD9CE] text-[#33363F] hover:bg-[#F3F1EA] dark:bg-white/5 dark:border-white/10 dark:text-slate-200'
+            }`}
+          >
+            <Waves className="h-3.5 w-3.5 text-blue-500" />
+            <span className="hidden sm:inline">Simulation</span>
+          </button>
+
+          {/* Clean Tools & Operations Menu Pill (Eliminates Visual Clutter) */}
+          <div className="relative" ref={toolsRef}>
+            <button
+              onClick={() => setToolsOpen(!toolsOpen)}
+              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-bold tracking-wider uppercase transition shadow-2xs ${
+                toolsOpen || (p.openPanel && !['simulation', 'rescue', 'citizen'].includes(p.openPanel))
+                  ? 'bg-[#181A1E] text-white'
+                  : 'bg-white border border-[#DDD9CE] text-[#181A1E] hover:bg-[#F3F1EA] dark:bg-white/10 dark:border-white/15 dark:text-white'
+              }`}
+            >
+              <Menu className="h-3.5 w-3.5" />
+              <span>Panels & Tools</span>
+              <ChevronDown className={`h-3 w-3 transition-transform ${toolsOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {/* Tools Dropdown Popover */}
+            {toolsOpen && (
+              <div className="absolute right-0 mt-2 w-72 rounded-3xl bg-white/95 dark:bg-[#1A1C22]/95 backdrop-blur-xl border border-[#DDD9CE] dark:border-white/10 shadow-2xl p-3 z-50 space-y-2.5">
+                <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-[#6A6D75] px-2">
+                  DISASTER INTELLIGENCE PANELS
+                </div>
+                <div className="grid grid-cols-2 gap-1.5">
+                  <button onClick={() => { p.onPanel('weather'); setToolsOpen(false); }} className={`flex items-center gap-2 p-2 rounded-xl text-left text-xs font-semibold ${p.openPanel === 'weather' ? 'bg-[#181A1E] text-white' : 'hover:bg-[#F4F2EB] text-[#23252A] dark:text-slate-200'}`}>
+                    <CloudRain className="h-4 w-4 text-sky-500" /> Weather
+                  </button>
+                  <button onClick={() => { p.onPanel('risk'); setToolsOpen(false); }} className={`flex items-center gap-2 p-2 rounded-xl text-left text-xs font-semibold ${p.openPanel === 'risk' ? 'bg-[#181A1E] text-white' : 'hover:bg-[#F4F2EB] text-[#23252A] dark:text-slate-200'}`}>
+                    <ShieldAlert className="h-4 w-4 text-amber-500" /> Risk Grid
+                  </button>
+                  <button onClick={() => { p.onPanel('evacuation'); setToolsOpen(false); }} className={`flex items-center gap-2 p-2 rounded-xl text-left text-xs font-semibold ${p.openPanel === 'evacuation' ? 'bg-[#181A1E] text-white' : 'hover:bg-[#F4F2EB] text-[#23252A] dark:text-slate-200'}`}>
+                    <Route className="h-4 w-4 text-emerald-500" /> Evacuation
+                  </button>
+                  <button onClick={() => { p.onPanel('alerts'); setToolsOpen(false); }} className={`flex items-center gap-2 p-2 rounded-xl text-left text-xs font-semibold ${p.openPanel === 'alerts' ? 'bg-[#181A1E] text-white' : 'hover:bg-[#F4F2EB] text-[#23252A] dark:text-slate-200'}`}>
+                    <Bell className="h-4 w-4 text-rose-500" /> Alerts
+                  </button>
+                  <button onClick={() => { p.onPanel('cameras'); setToolsOpen(false); }} className={`flex items-center gap-2 p-2 rounded-xl text-left text-xs font-semibold ${p.openPanel === 'cameras' ? 'bg-[#181A1E] text-white' : 'hover:bg-[#F4F2EB] text-[#23252A] dark:text-slate-200'}`}>
+                    <Video className="h-4 w-4 text-purple-500" /> Cameras
+                  </button>
+                  <button onClick={() => { p.onPanel('ai'); setToolsOpen(false); }} className={`flex items-center gap-2 p-2 rounded-xl text-left text-xs font-semibold ${p.openPanel === 'ai' ? 'bg-[#181A1E] text-white' : 'hover:bg-[#F4F2EB] text-[#23252A] dark:text-slate-200'}`}>
+                    <Bot className="h-4 w-4 text-cyan-500" /> Copilot
+                  </button>
+                  <button onClick={() => { p.onPanel('data'); setToolsOpen(false); }} className={`flex items-center gap-2 p-2 rounded-xl text-left text-xs font-semibold ${p.openPanel === 'data' ? 'bg-[#181A1E] text-white' : 'hover:bg-[#F4F2EB] text-[#23252A] dark:text-slate-200'}`}>
+                    <Database className="h-4 w-4 text-slate-500" /> Standards
+                  </button>
+                  <button onClick={() => { p.onPanel('admin'); setToolsOpen(false); }} className={`flex items-center gap-2 p-2 rounded-xl text-left text-xs font-semibold ${p.openPanel === 'admin' ? 'bg-[#181A1E] text-white' : 'hover:bg-[#F4F2EB] text-[#23252A] dark:text-slate-200'}`}>
+                    <Shield className="h-4 w-4 text-teal-600" /> Triage
+                  </button>
+                  <a
+                    href="https://github.com/ABDULMUNAFZ/Hyperlocal-Intelligence-for-Flash-Flood-Prediction-Risk--Response"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between p-2 rounded-xl text-left text-xs font-semibold bg-[#181A1E] text-[#D4F826] hover:bg-black transition-all"
+                  >
+                    <span className="flex items-center gap-2"><Github className="h-4 w-4 text-white" /> Star on GitHub</span>
+                    <span className="text-white text-[10px]">★ repo</span>
+                  </a>
+                </div>
+              </div>
+            )}
+          </div>
         </nav>
         {p.responder && (
-          <button onClick={() => p.onPanel('rescue')} title="People who requested rescue (responders only)" className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[10.5px] font-extrabold tracking-[0.14em] ${p.openPanel === 'rescue' ? 'bg-rose-700 text-white' : 'border border-rose-600 text-rose-600'}`}>
+          <button onClick={() => p.onPanel('rescue')} title="People who requested rescue (responders only)" className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10.5px] font-extrabold tracking-[0.14em] ${p.openPanel === 'rescue' ? 'bg-rose-700 text-white' : 'border border-rose-600 text-rose-600'}`}>
             <Users className="h-3.5 w-3.5" /><span className="hidden sm:inline">RESCUE PEOPLE</span>
             {!!p.rescueCount && <span className="rounded-full bg-rose-600 px-1.5 text-[10px] text-white">{p.rescueCount}</span>}
           </button>
         )}
-        <button onClick={() => p.onPanel('citizen')} title="I need help / report" className="flex items-center gap-1.5 rounded-lg bg-rose-600 px-2.5 py-1.5 text-[10.5px] font-extrabold tracking-[0.14em] text-white hover:bg-rose-700">
+        <button onClick={() => p.onPanel('citizen')} title="I need help / report" className="flex items-center gap-1.5 rounded-full bg-rose-600 px-3 py-1.5 text-[10.5px] font-extrabold tracking-[0.14em] text-white hover:bg-rose-700 shadow-xs">
           <LifeBuoy className="h-3.5 w-3.5" /><span className="hidden sm:inline">HELP</span>
         </button>
-        <button onClick={p.onDemo} title="Deterministic DEMO / SIMULATION scenario" className={`hidden md:flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-[10.5px] font-extrabold tracking-[0.14em] ${p.demoActive ? 'bg-amber-400 text-amber-950' : 'border border-amber-400 text-amber-600'}`}>
+        <button onClick={p.onDemo} title="Deterministic DEMO / SIMULATION scenario" className={`hidden md:flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10.5px] font-extrabold tracking-[0.14em] ${p.demoActive ? 'bg-amber-400 text-amber-950 font-bold' : 'border border-amber-500/60 text-amber-700 dark:text-amber-400'}`}>
           <Clapperboard className="h-3.5 w-3.5" />{p.demoActive ? 'STOP DEMO' : 'DEMO'}
         </button>
 
         <div className="flex items-center gap-1 pl-1 md:pl-2 md:border-l border-slate-200 dark:border-white/10">
+          <a
+            href="https://github.com/ABDULMUNAFZ/Hyperlocal-Intelligence-for-Flash-Flood-Prediction-Risk--Response"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden lg:inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10.5px] font-mono font-medium bg-white/80 dark:bg-white/10 hover:bg-[#F3F1EA] text-[#181A1E] dark:text-white border border-[#DDD9CE] dark:border-white/10 shadow-2xs transition-all hover:scale-105"
+            title="Star FloodGuard on GitHub"
+          >
+            <Github className="h-3 w-3" />
+            <span>Star</span>
+            <span className="text-[#9BBD00] dark:text-[#D4F826] font-bold">★</span>
+          </a>
           <SoundControl />
           <button title="Toggle 3D / 2D" onClick={p.on3D} className="rounded-md p-1.5 hover:bg-slate-100 dark:hover:bg-white/10 text-[10px] font-bold flex items-center gap-1">
             {p.is3D ? <Box className="h-4 w-4" /> : <Square className="h-4 w-4" />}<span className="hidden md:inline">{p.is3D ? '3D' : '2D'}</span>

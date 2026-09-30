@@ -5,7 +5,11 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Layout } from './components/Layout';
 import WayanadCommandCenter from './pages/WayanadCommandCenter';
 import { CommandCenterErrorBoundary } from './components/Wayanad/ErrorBoundary';
-// Secondary pages are code-split so the command center loads first
+import FloodGuardLoader from './components/FloodGuardLoader';
+// Lazy load pages for optimal bundle splitting
+const LandingPage = lazy(() => import('./pages/LandingPage'));
+const ProductionRoadmap = lazy(() => import('./pages/ProductionRoadmap'));
+const AdminPage = lazy(() => import('./pages/AdminPage'));
 const CommandCenter = lazy(() => import('./pages/CommandCenter'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Map3D = lazy(() => import('./pages/Map3D'));
@@ -38,22 +42,39 @@ const App: React.FC = () => {
     <QueryClientProvider client={queryClient}>
       <LocationProvider>
         <BrowserRouter>
-          <Suspense fallback={null}>
+          <Suspense fallback={<FloodGuardLoader />}>
           <Routes>
-            {/* Primary: Wayanad 3D situational-awareness command center (real data only) */}
-            <Route path="/" element={<CommandCenterErrorBoundary><WayanadCommandCenter /></CommandCenterErrorBoundary>} />
+            {/* 1. Master Premium Landing Page */}
+            <Route path="/" element={<LandingPage />} />
+
+            {/* 2. Operational Wayanad 3D Command Center */}
+            <Route path="/app" element={<CommandCenterErrorBoundary><WayanadCommandCenter /></CommandCenterErrorBoundary>} />
+            <Route path="/app/map" element={<CommandCenterErrorBoundary><WayanadCommandCenter /></CommandCenterErrorBoundary>} />
             <Route path="/command" element={<CommandCenterErrorBoundary><WayanadCommandCenter /></CommandCenterErrorBoundary>} />
             <Route path="/map" element={<CommandCenterErrorBoundary><WayanadCommandCenter /></CommandCenterErrorBoundary>} />
-            {/* Previous South India prototype (uses illustrative, non-sourced sample data) */}
-            <Route path="/south-india" element={<CommandCenter />} />
 
-            {/* Citizen emergency app (installable PWA): alerts, location pin, rescue, evacuation */}
+            {/* 3. Production Architecture & Deployment Roadmap */}
+            <Route path="/production" element={<ProductionRoadmap />} />
+            <Route path="/roadmap" element={<ProductionRoadmap />} />
+
+            {/* 4. Admin Response Center */}
+            <Route path="/app/admin" element={<AdminPage />} />
+            <Route path="/admin" element={<AdminPage />} />
+
+            {/* 5. Citizen Emergency App (Installable PWA) */}
+            <Route path="/app/emergency" element={<EmergencyApp />} />
             <Route path="/emergency" element={<EmergencyApp />} />
 
-            {/* Authentication */}
+            {/* 6. Simulations & What-If scenarios */}
+            <Route path="/app/simulation" element={<Simulations />} />
+
+            {/* 7. Previous South India prototype */}
+            <Route path="/south-india" element={<CommandCenter />} />
+
+            {/* 8. Authentication */}
             <Route path="/login" element={<Login />} />
 
-            {/* Standard Dashboard & Analytics views */}
+            {/* 9. Standard Dashboard & Analytics views */}
             <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/risk" element={<RiskAnalysis />} />

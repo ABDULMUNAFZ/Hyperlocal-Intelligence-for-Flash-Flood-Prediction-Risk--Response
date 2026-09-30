@@ -1,5 +1,6 @@
-// FloodGuard Emergency — installable citizen app (PWA) at /emergency.
 import React, { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
+import FloodGuardLogo from '../components/common/FloodGuardLogo';
 import { useEmergencyApp } from '../emergency/useEmergencyApp';
 import { AuthScreen } from '../emergency/AuthScreen';
 import { Setup, LocationChip, PushChip } from '../emergency/Setup';
@@ -69,51 +70,57 @@ export default function EmergencyApp() {
   const arrived = request?.status === S.REACHED_SAFE_LOCATION && dismissedArrival !== request.id;
 
   return (
-    <div className="min-h-[100dvh] bg-slate-100 text-slate-900" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
-      {alert?.is_demo && <div className="sticky top-0 z-30 bg-amber-400 py-1.5 text-center text-[12px] font-black tracking-wider text-amber-950">DEMO EMERGENCY — NOT A REAL WARNING</div>}
-      <header className="bg-[#0d2b59] px-4 pb-4 pt-3 text-white">
+    <div className="min-h-[100dvh] bg-[#F6F5F2] text-[#141518]" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      {alert?.is_demo && <div className="sticky top-0 z-30 bg-[#DDD6EE] py-2 text-center text-[12px] font-black tracking-wider text-[#141518] border-b border-[#C5BADF]">DEMO EMERGENCY — NOT A REAL WARNING</div>}
+      <header className="bg-[#141518] px-4 pb-4 pt-3.5 text-white shadow-md">
         <div className="mx-auto flex max-w-lg items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <img src="/icons/icon-192.png" alt="" className="h-9 w-9 rounded-xl" />
+            <Link to="/" className="h-9 w-9 rounded-xl bg-white/10 border border-white/20 p-2 flex items-center justify-center hover:bg-white/20 transition-colors" title="Return to FloodGuard Home">
+              <FloodGuardLogo className="h-5 w-auto" variant="citron" />
+            </Link>
             <div>
-              <div className="text-[15px] font-black tracking-[0.12em]">FLOODGUARD</div>
-              <div className="text-[10px] font-bold tracking-[0.22em] text-sky-200">EMERGENCY · WAYANAD</div>
+              <div className="text-[15px] font-black tracking-[0.14em] flex items-center gap-1.5">
+                <span>FLOODGUARD</span>
+                <span className="px-1.5 py-0.2 rounded-full bg-[#D4F826] text-[#181A1E] text-[8px] font-mono font-bold">SOS</span>
+              </div>
+              <div className="text-[10px] font-bold tracking-[0.22em] text-[#D4F826]">CITIZEN LIFELINE · WAYANAD</div>
             </div>
           </div>
-          {me && <button onClick={app.signOut} className="rounded-lg bg-white/10 px-2.5 py-1.5 text-[11px] font-bold">Sign out</button>}
+          {me && <button onClick={app.signOut} className="rounded-full bg-white/10 hover:bg-white/20 px-3 py-1 text-[11px] font-semibold transition-colors">Sign out</button>}
         </div>
         {me && (
           <div className="mx-auto mt-3 flex max-w-lg flex-wrap gap-1.5">
             <LocationChip me={me} />
             <PushChip me={me} />
-            <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10.5px] font-bold tracking-wider ${app.stream.connected ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700'}`}>
+            <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10.5px] font-bold tracking-wider ${app.stream.connected ? 'bg-[#DDD6EE] text-[#141518]' : 'bg-slate-800 text-slate-300'}`}>
               LIVE: {app.stream.connected ? 'CONNECTED' : 'RECONNECTING'}
             </span>
           </div>
         )}
       </header>
 
-      <main className="mx-auto max-w-lg space-y-3 p-3">
+      <main className="mx-auto max-w-lg space-y-3.5 p-3.5">
         {app.incoming && (
-          <div className="rounded-2xl bg-rose-700 p-3 text-white shadow-xl">
+          <div className="rounded-2xl bg-rose-700 p-4 text-white shadow-xl">
             <div className="flex items-center justify-between gap-2">
               {app.incoming.is_demo ? <KindBadge kind="DEMO" isDemo /> : <span className="text-[11px] font-black tracking-wider">NEW ALERT</span>}
-              <button onClick={() => app.setIncoming(null)} className="rounded bg-white/15 px-2 py-0.5 text-[11px] font-bold">OK</button>
+              <button onClick={() => app.setIncoming(null)} className="rounded-full bg-white/20 px-2.5 py-0.5 text-[11px] font-bold">OK</button>
             </div>
             <div className="mt-1 text-[15px] font-black">{app.incoming.title}</div>
-            <div className="text-[13px]">{app.incoming.body}</div>
+            <div className="text-[13px] opacity-90">{app.incoming.body}</div>
           </div>
         )}
 
         {!app.token && (
           <>
-            <div className="rounded-2xl bg-white p-4 text-[13.5px] text-slate-700 ring-1 ring-slate-200">
-              Register once to receive emergency alerts for your area, pin your location for rescuers, and find the nearest designated safe location.
+            <div className="rounded-2xl bg-white p-4.5 text-[13.5px] text-[#333740] border border-[#E6E4DE] shadow-sm">
+              Register once to receive early predictive warnings for your location, pin your GPS coordinates for rescue teams, and navigate to designated safe shelters.
             </div>
             <AuthScreen onSignIn={app.signIn} />
-            <a href="tel:112" className="block rounded-2xl bg-rose-600 py-3 text-center text-[15px] font-black text-white">CALL 112</a>
+            <a href="tel:112" className="block rounded-full bg-[#141518] hover:bg-rose-700 py-3.5 text-center text-[15px] font-black text-white shadow-md transition-colors">CALL 112 (POLICE / RESCUE)</a>
           </>
         )}
+
 
         {app.token && app.loading && <div className="py-16 text-center text-[13px] text-slate-500">Loading…</div>}
         {app.token && !app.loading && !me && (
