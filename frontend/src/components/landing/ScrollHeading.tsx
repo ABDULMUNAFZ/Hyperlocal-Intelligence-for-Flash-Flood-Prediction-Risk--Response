@@ -1,5 +1,5 @@
 import React from 'react';
-import ScrollReveal from '../react-bits/ScrollReveal';
+import { LazyScrollReveal as ScrollReveal } from '../react-bits/lazy';
 
 export type HeadingAnimationVariant =
   | 'default'

@@ -145,11 +145,13 @@ export default function Dither({
 
     let renderer;
     try {
+      // Performance: no MSAA (pointless on a pixel-dither pattern), no preserved buffer, low-power GPU.
       renderer = new THREE.WebGLRenderer({
         canvas,
-        antialias: true,
-        preserveDrawingBuffer: true,
+        antialias: false,
+        preserveDrawingBuffer: false,
         alpha: true,
+        powerPreference: 'low-power',
       });
     } catch {
       return;
@@ -188,7 +190,8 @@ export default function Dither({
     const updateSize = () => {
       const width = container.clientWidth || window.innerWidth;
       const height = container.clientHeight || window.innerHeight;
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      // 1x is plenty for a 35%-opacity dithered background (2.25x fewer pixels than 1.5x on retina)
+      const dpr = 1;
       renderer.setPixelRatio(dpr);
       renderer.setSize(width, height, false);
       uniforms.resolution.value.set(width * dpr, height * dpr);
@@ -221,12 +224,19 @@ export default function Dither({
     let animId;
     const clock = new THREE.Clock();
 
-    const animate = () => {
+    const FRAME_MS = 1000 / 30; // the wave moves slowly: 30 fps looks identical and halves GPU work
+    let last = -Infinity;
+    const animate = (now = performance.now()) => {
       if (!isVisible) return; // Zero GPU cycles when scrolled away
-      if (!disableAnimation) {
-        uniforms.time.value = clock.getElapsedTime();
+      if (disableAnimation) {
+        renderer.render(scene, camera); // single static frame
+        return;
       }
-      renderer.render(scene, camera);
+      if (now - last >= FRAME_MS) {
+        last = now;
+        uniforms.time.value = clock.getElapsedTime();
+        renderer.render(scene, camera);
+      }
       animId = requestAnimationFrame(animate);
     };
 
@@ -245,8 +255,9 @@ export default function Dither({
     waveSpeed,
     waveFrequency,
     waveAmplitude,
-    waveColor,
-    backgroundColor,
+    // compare colours by value: inline arrays from the parent must not rebuild the WebGL renderer
+    waveColor.join(','),
+    backgroundColor.join(','),
     colorNum,
     pixelSize,
     disableAnimation,

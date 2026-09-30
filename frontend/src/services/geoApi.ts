@@ -46,5 +46,7 @@ export const geoApi = {
       '/geo/assistant', { question, context }, LONG)).data,
   predict: async (latitude: number, longitude: number) =>
     (await api.post<Prediction>('/prediction/predict', { latitude, longitude, prediction_horizon_hours: 24 }, LONG)).data,
-  health: async () => (await api.get<{ status: string }>('/health')).data,
+  // Lightweight readiness probe (API up + database reachable) for the online badge; the full
+  // component check (/health: Celery, ML, migrations…) is for monitoring and takes seconds.
+  health: async () => (await api.get<{ status: string }>('/health/ready')).data,
 };

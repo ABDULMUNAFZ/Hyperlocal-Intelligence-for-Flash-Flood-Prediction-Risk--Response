@@ -5,7 +5,7 @@ import {
   ArrowUpRight,
   Sparkles,
 } from 'lucide-react';
-import Dither from '../react-bits/Dither';
+import { LazyDither as Dither } from '../react-bits/lazy';
 import FloodComparisonViewer from './FloodComparisonViewer';
 
 export const HeroSection: React.FC = () => {
@@ -69,7 +69,7 @@ export const HeroSection: React.FC = () => {
             }}
           >
             {/* VISUAL SUBJECT: Interactive Hover-Based Before & After Flood Comparison */}
-            {/* Direct uncompressed images hero1.png and hero2.png with zero obstruction */}
+            {/* hero1 / hero2 served as responsive WebP (PNG originals kept as fallback) */}
             <div className="absolute inset-0">
               <FloodComparisonViewer />
             </div>

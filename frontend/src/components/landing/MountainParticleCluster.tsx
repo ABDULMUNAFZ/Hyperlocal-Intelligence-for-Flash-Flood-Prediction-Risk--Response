@@ -157,9 +157,9 @@ export const MountainParticleCluster: React.FC<MountainParticleClusterProps> = (
         const floatY = Math.cos(time * p.speed * 0.8 + p.phase) * 5;
 
         // Mouse displacement
-        let dx = mouseX - (p.baseX + floatX);
-        let dy = mouseY - (p.baseY + floatY);
-        let dist = Math.hypot(dx, dy);
+        const dx = mouseX - (p.baseX + floatX);
+        const dy = mouseY - (p.baseY + floatY);
+        const dist = Math.hypot(dx, dy);
 
         let targetX = p.baseX + floatX;
         let targetY = p.baseY + floatY;

@@ -14,11 +14,20 @@
     <meta name="author" content="Team Tech Mavericks" />
     <meta name="theme-color" content="#0a0f18" />
     <title>FloodGuard — Hyperlocal Flash-Flood Intelligence | SIH 2026</title>
+    <!-- Pre-CSS background matching the landing page: avoids a dark flash before the app styles load
+         (globals.css, loaded after this, restores the normal light/dark body colours) -->
+    <style>html,body{background:#EBE8E0;color:#23252A}</style>
+    <!-- Warm up connections the app needs right after first paint (API, map tiles, terrain tiles) -->
+    <link rel="preconnect" href="https://api.techmavericks.me" crossorigin>
+    <link rel="preconnect" href="https://tiles.openfreemap.org" crossorigin>
+    <link rel="dns-prefetch" href="https://s3.amazonaws.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Fonts load without blocking first render (text shows in the fallback font, then swaps) -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"></noscript>
   </head>
-  <body class="min-h-screen bg-slate-950 text-slate-100 selection:bg-cyan-500/30 selection:text-cyan-200">
+  <body class="min-h-screen selection:bg-cyan-500/30 selection:text-cyan-200">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

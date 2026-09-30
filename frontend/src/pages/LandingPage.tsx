@@ -11,12 +11,26 @@ import { SimulationSection } from '../components/landing/SimulationSection';
 import { MobileJourneySection } from '../components/landing/MobileJourneySection';
 import { AdminCommandPreview } from '../components/landing/AdminCommandPreview';
 import { LandingFooter } from '../components/landing/LandingFooter';
-import TextCursor from '../components/react-bits/TextCursor';
-import ScrollReveal from '../components/react-bits/ScrollReveal';
+import { LazyTextCursor as TextCursor, LazyScrollReveal as ScrollReveal } from '../components/react-bits/lazy';
 
 export default function LandingPage() {
   useEffect(() => {
     document.title = 'FloodGuard — Hyperlocal Flash-Flood Intelligence';
+  }, []);
+
+  // Prefetch the 3D command center (map engine + page code) once the landing page is idle, so
+  // "VIEW 3D MAP" opens instantly. Skipped on data-saver / slow connections.
+  useEffect(() => {
+    const conn = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+    if (conn?.saveData || /(^|-)2g$/.test(conn?.effectiveType ?? '')) return;
+    const w = window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number; cancelIdleCallback?: (id: number) => void };
+    const prefetch = () => { import('./WayanadCommandCenter').catch(() => undefined); };
+    if (w.requestIdleCallback) {
+      const id = w.requestIdleCallback(prefetch, { timeout: 4000 });
+      return () => w.cancelIdleCallback?.(id);
+    }
+    const t = window.setTimeout(prefetch, 3000);
+    return () => window.clearTimeout(t);
   }, []);
 
   return (

@@ -62,10 +62,18 @@ export const FloodComparisonViewer: React.FC<FloodComparisonViewerProps> = ({
       {/* LAYER 1: AFTER FLOOD / INUNDATION MAP (Hero 2 - Full Layer) */}
       <div className="absolute inset-0 w-full h-full">
         <img
-          src="/images/hero2.png"
+          // Responsive WebP (≈160 KB at 1920 px instead of a 3.5 MB PNG); PNG remains as fallback
+          src="/images/hero2-1920.webp"
+          srcSet="/images/hero2-1280.webp 1280w, /images/hero2-1920.webp 1920w, /images/hero2-2446.webp 2446w"
+          sizes="(min-width: 1024px) 70vw, 100vw"
+          width={2446}
+          height={1368}
+          decoding="async"
+          fetchPriority="low"
           onError={(e) => {
-            // Fallback to alternative image if hero2.png is not found
-            (e.currentTarget as HTMLImageElement).src = '/images/wayanad-flooded-map.png';
+            const img = e.currentTarget as HTMLImageElement;
+            img.removeAttribute('srcset');
+            img.src = img.src.includes('hero2.png') ? '/images/wayanad-flooded-map.png' : '/images/hero2.png';
           }}
           alt="Wayanad Deluge Flood Inundation Map"
           className="w-full h-full object-cover object-center select-none pointer-events-none"
@@ -94,10 +102,18 @@ export const FloodComparisonViewer: React.FC<FloodComparisonViewerProps> = ({
         }}
       >
         <img
-          src="/images/hero1.png"
+          // Largest contentful paint image: responsive WebP, fetched first (PNG remains as fallback)
+          src="/images/hero1-1920.webp"
+          srcSet="/images/hero1-1280.webp 1280w, /images/hero1-1920.webp 1920w, /images/hero1-2560.webp 2560w"
+          sizes="(min-width: 1024px) 70vw, 100vw"
+          width={2618}
+          height={1498}
+          decoding="async"
+          fetchPriority="high"
           onError={(e) => {
-            // Fallback to alternative image if hero1.png is not found
-            (e.currentTarget as HTMLImageElement).src = '/images/wayanad-before-flood.jpg';
+            const img = e.currentTarget as HTMLImageElement;
+            img.removeAttribute('srcset');
+            img.src = img.src.includes('hero1.png') ? '/images/wayanad-before-flood.jpg' : '/images/hero1.png';
           }}
           alt="Wayanad Baseline Before Flood Risk Terrain"
           className="w-full h-full object-cover object-center select-none pointer-events-none"
