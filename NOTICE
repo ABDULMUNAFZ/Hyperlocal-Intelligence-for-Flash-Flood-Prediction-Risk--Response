@@ -1,0 +1,38 @@
+FloodGuard — Hyperlocal intelligence for flash-flood prediction, risk & rescue
+Copyright 2026 Team Tech Mavericks
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Developed for Smart India Hackathon 2026, Problem Statement ID 26192:
+"Flash Flood Prediction System for Hilly Regions using Multi-Source Data".
+
+-------------------------------------------------------------------------------
+Third-party data and services (not covered by this project's license; each keeps
+its own terms and requires the attribution below when displayed or redistributed)
+-------------------------------------------------------------------------------
+
+Map data © OpenStreetMap contributors, available under the Open Database License
+(ODbL). https://www.openstreetmap.org/copyright
+
+Vector base map: OpenFreeMap, © OpenMapTiles, © OpenStreetMap contributors.
+
+Terrain: Copernicus GLO-30 Digital Elevation Model © DLR e.V. 2010–2014 and
+© Airbus Defence and Space GmbH 2014–2018, provided under COPERNICUS by the
+European Union and ESA. 3D map terrain: Terrain Tiles on AWS (Mapzen / Tilezen).
+
+Land cover: ESA WorldCover 2021 (CC BY 4.0).
+
+Population: High Resolution Settlement Layer, Meta & CIESIN, Columbia University
+(CC BY 4.0).
+
+Soil: ISRIC SoilGrids 2.0 (CC BY 4.0).
+
+Weather: Open-Meteo.com (CC BY 4.0).
+
+Official alerts: NDMA SACHET Common Alerting Protocol feed, Government of India.
+
+Routing: OSRM (Open Source Routing Machine) public servers operated by FOSSGIS e.V.
+and project-osrm.org; route data © OpenStreetMap contributors (ODbL).
+
+Software dependencies are distributed under their own licenses (MIT, BSD,
+Apache-2.0 and others); see frontend/package-lock.json and backend/requirements.txt.
