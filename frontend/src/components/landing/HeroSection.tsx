@@ -45,27 +45,7 @@ export const HeroSection: React.FC = () => {
         {/* DESKTOP HERO ARCHITECTURE (>= 1024px) - EXACT DEFAULT REFERENCE MATCH */}
         <div className="hidden lg:block relative w-full h-[690px]">
           {/* 1. OUTSIDE TOP-LEFT NOTCH (Sitting in the upper-left cutout) */}
-          <div className="absolute top-0 left-2 z-30 max-w-xl select-none">
-            {/* Official Smart India Hackathon 2026 Accreditation Tag */}
-            <div className="space-y-1.5 mb-3">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#181A1E] text-white border border-[#2B2E37] shadow-md text-[11px] font-mono">
-                <span className="h-2 w-2 rounded-full bg-[#D4F826] animate-pulse" />
-                <span className="text-[#D4F826] font-bold tracking-wider">SMART INDIA HACKATHON 2026</span>
-                <span className="text-white/40">|</span>
-                <span className="text-white font-semibold">PS ID: 26192</span>
-              </div>
-              <div className="px-3.5 py-1.5 rounded-2xl bg-white/95 border border-[#DDD9CE] shadow-xs text-[10.5px] font-mono text-[#33363F] max-w-lg leading-snug">
-                <div className="font-bold text-[#181A1E] truncate">
-                  PS: <span className="font-medium text-[#45474E]">Flash Flood Prediction System for Hilly Regions using Multi-Source Data Theme</span>
-                </div>
-                <div className="text-[10px] text-[#6A6D75] mt-0.5 flex items-center gap-2">
-                  <span>Done by: <strong className="text-[#181A1E] font-bold">Team Tech Mavericks</strong></span>
-                  <span>•</span>
-                  <span>Smart India Hackathon 2026</span>
-                </div>
-              </div>
-            </div>
-
+          <div className="absolute top-0 left-2 z-30 max-w-lg select-none">
             <div className="font-mono text-sm tracking-widest text-[#45474E] uppercase flex items-center gap-1.5 font-medium">
               <span className="text-[#181A1E] font-bold">: //</span> BRINGING DATA TO REAL LIFE
             </div>
@@ -180,20 +160,6 @@ export const HeroSection: React.FC = () => {
         <div className="block lg:hidden space-y-6">
           {/* Mobile Top Heading */}
           <div className="text-center sm:text-left space-y-2">
-            {/* Official Smart India Hackathon 2026 Accreditation Tag */}
-            <div className="flex flex-col gap-1.5 items-center sm:items-start mb-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#181A1E] text-white border border-[#2B2E37] shadow-md text-[10px] font-mono">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#D4F826] animate-pulse" />
-                <span className="text-[#D4F826] font-bold">SMART INDIA HACKATHON 2026</span>
-                <span className="text-white/40">|</span>
-                <span>PS ID: 26192</span>
-              </div>
-              <div className="px-3 py-1 rounded-xl bg-white/95 border border-[#DDD9CE] shadow-2xs text-[10px] font-mono text-[#33363F] text-center sm:text-left max-w-sm">
-                <div>Flash Flood Prediction System for Hilly Regions using Multi-Source Data</div>
-                <div className="text-[#6A6D75] mt-0.5">Team Tech Mavericks · Smart India Hackathon 2026</div>
-              </div>
-            </div>
-
             <div className="font-mono text-xs tracking-widest text-[#45474E] uppercase flex items-center justify-center sm:justify-start gap-1.5 font-medium">
               <span className="text-[#181A1E] font-bold">: //</span> BRINGING DATA TO REAL LIFE
             </div>
@@ -259,26 +225,28 @@ export const HeroSection: React.FC = () => {
           </div>
         </div>
 
-        {/* District Running Ticker Bar Below Hero (Includes SIH 2026 Credits) */}
+        {/* District Running Ticker Bar Below Hero */}
         <div className="relative z-20 w-full mt-10 py-3.5 bg-[#181A1E] text-[#FAF9F6] rounded-2xl border border-[#2A2D35] shadow-xs overflow-hidden">
           <div className="marquee-track">
             <div className="marquee-content font-mono text-xs sm:text-sm tracking-wider uppercase">
-              <span className="text-[#D4F826] font-bold">★ SMART INDIA HACKATHON 2026 · PROBLEM STATEMENT ID: 26192 · PROBLEM STATEMENT TITLE: FLASH FLOOD PREDICTION SYSTEM FOR HILLY REGIONS USING MULTI-SOURCE DATA THEME · DONE BY TEAM TECH MAVERICKS</span>
-              <span>◆ HYPERLOCAL FLASH-FLOOD INTELLIGENCE FOR WAYANAD</span>
+              <span className="text-[#D4F826]">◆ HYPERLOCAL FLASH-FLOOD INTELLIGENCE FOR WAYANAD</span>
               <span>· 461 GAUGED WATERSHEDS</span>
               <span>· 30M COPERNICUS DEM</span>
               <span>· DOPPLER RADAR REFLECTIVITY</span>
               <span className="text-[#D4F826]">· LEAD TIME &lt; 45 MIN</span>
               <span>· AI DETECTS · HUMANS DECIDE</span>
+              <span>· 100% DISASTER TRIAGE WORKFLOW</span>
+              <span>· REAL-TIME RUNOFF KINEMATICS</span>
             </div>
             <div className="marquee-content font-mono text-xs sm:text-sm tracking-wider uppercase" aria-hidden="true">
-              <span className="text-[#D4F826] font-bold">★ SMART INDIA HACKATHON 2026 · PROBLEM STATEMENT ID: 26192 · PROBLEM STATEMENT TITLE: FLASH FLOOD PREDICTION SYSTEM FOR HILLY REGIONS USING MULTI-SOURCE DATA THEME · DONE BY TEAM TECH MAVERICKS</span>
-              <span>◆ HYPERLOCAL FLASH-FLOOD INTELLIGENCE FOR WAYANAD</span>
+              <span className="text-[#D4F826]">◆ HYPERLOCAL FLASH-FLOOD INTELLIGENCE FOR WAYANAD</span>
               <span>· 461 GAUGED WATERSHEDS</span>
               <span>· 30M COPERNICUS DEM</span>
               <span>· DOPPLER RADAR REFLECTIVITY</span>
               <span className="text-[#D4F826]">· LEAD TIME &lt; 45 MIN</span>
               <span>· AI DETECTS · HUMANS DECIDE</span>
+              <span>· 100% DISASTER TRIAGE WORKFLOW</span>
+              <span>· REAL-TIME RUNOFF KINEMATICS</span>
             </div>
           </div>
         </div>
