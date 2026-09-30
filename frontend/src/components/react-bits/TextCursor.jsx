@@ -26,10 +26,9 @@ const TextCursor = ({
   }, []);
 
   const handleMouseMove = e => {
-    if (!containerRef.current || !isPointerFine) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
+    if (!isPointerFine) return;
+    const mouseX = e.clientX;
+    const mouseY = e.clientY;
 
     const createRandomData = () =>
       randomFloat
@@ -85,17 +84,14 @@ const TextCursor = ({
 
   useEffect(() => {
     if (!isPointerFine) return;
-    const container = containerRef.current;
-    if (!container) return;
-
-    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, [spacing, followMouseDirection, randomFloat, maxPoints, isPointerFine]);
 
   useEffect(() => {
     if (!isPointerFine) return;
     const interval = setInterval(() => {
-      if (Date.now() - lastMoveTimeRef.current > 100) {
+      if (Date.now() - lastMoveTimeRef.current > 80) {
         setTrail(prev => (prev.length > 0 ? prev.slice(1) : prev));
       }
     }, removalInterval);
@@ -105,7 +101,7 @@ const TextCursor = ({
   if (!isPointerFine) return null;
 
   return (
-    <div ref={containerRef} className="text-cursor-container">
+    <div ref={containerRef} className="text-cursor-container" aria-hidden="true">
       <div className="text-cursor-inner">
         <AnimatePresence>
           {trail.map(item => (
@@ -113,7 +109,7 @@ const TextCursor = ({
               key={item.id}
               initial={{ opacity: 0, scale: 0.6, rotate: item.angle }}
               animate={{
-                opacity: 0.9,
+                opacity: 0.95,
                 scale: 1,
                 x: randomFloat ? [0, item.randomX || 0, 0] : 0,
                 y: randomFloat ? [0, item.randomY || 0, 0] : 0,
@@ -131,7 +127,14 @@ const TextCursor = ({
               className="text-cursor-item"
               style={{ left: item.x, top: item.y }}
             >
-              <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold tracking-wider bg-[#181A1E] text-[#D4F826] shadow-lg shadow-black/25 backdrop-blur-md border border-[#2B2E37]">
+              {/* Pure visible text with no background box/capsule */}
+              <span
+                className="inline-block text-[13px] font-mono font-black tracking-widest uppercase select-none pointer-events-none"
+                style={{
+                  color: '#D4F826',
+                  textShadow: '0 0 3px #000000, 0 1px 2px #000000, 0 0 8px rgba(0,0,0,0.9)',
+                }}
+              >
                 {text}
               </span>
             </motion.div>

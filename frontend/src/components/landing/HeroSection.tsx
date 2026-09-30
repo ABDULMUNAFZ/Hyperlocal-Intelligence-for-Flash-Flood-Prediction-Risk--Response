@@ -5,11 +5,27 @@ import {
   ArrowUpRight,
   Sparkles,
 } from 'lucide-react';
+import Dither from '../react-bits/Dither';
 import FloodComparisonViewer from './FloodComparisonViewer';
 
 export const HeroSection: React.FC = () => {
   return (
     <section className="relative min-h-[96vh] flex flex-col justify-center pt-24 pb-12 overflow-hidden bg-[#EBE8E0] text-[#181A1E]">
+      {/* React Bits Dither Wave Background Animation for Homepage First Page */}
+      <div className="absolute inset-0 pointer-events-none opacity-35 z-0 overflow-hidden">
+        <Dither
+          waveColor={[0.5, 0.5, 0.5]}
+          backgroundColor={[0.92, 0.91, 0.88]}
+          disableAnimation={false}
+          enableMouseInteraction={true}
+          mouseRadius={0.3}
+          colorNum={4}
+          waveAmplitude={0.3}
+          waveFrequency={3}
+          waveSpeed={0.05}
+        />
+      </div>
+
       {/* SVG Clip Path Definition for Asymmetric Stepped Scallop Frame (Exact Match to User Reference UI) */}
       <svg className="absolute w-0 h-0 pointer-events-none" aria-hidden="true">
         <defs>
@@ -20,7 +36,7 @@ export const HeroSection: React.FC = () => {
       </svg>
 
       {/* Background Topographic Texture */}
-      <div className="absolute inset-0 pointer-events-none light-contour-lines opacity-25 z-0" />
+      <div className="absolute inset-0 pointer-events-none light-contour-lines opacity-20 z-0" />
 
       {/* Main Container */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">

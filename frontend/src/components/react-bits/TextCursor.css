@@ -1,21 +1,27 @@
 .text-cursor-container {
-  width: 100%;
-  height: 100%;
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
 }
 
 .text-cursor-inner {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
+  width: 100vw;
+  height: 100vh;
   pointer-events: none;
 }
 
 .text-cursor-item {
-  position: absolute;
+  position: fixed;
   user-select: none;
+  pointer-events: none;
   white-space: nowrap;
-  font-size: 1.875rem;
+  will-change: transform, opacity;
 }

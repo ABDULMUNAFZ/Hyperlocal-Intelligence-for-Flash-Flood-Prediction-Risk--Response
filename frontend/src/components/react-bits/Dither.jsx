@@ -216,7 +216,7 @@ export default function Dither({
       uniforms.mousePos.value.set((e.clientX - rect.left) * dpr, (e.clientY - rect.top) * dpr);
     };
 
-    container.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
 
     let animId;
     const clock = new THREE.Clock();
@@ -236,7 +236,7 @@ export default function Dither({
       cancelAnimationFrame(animId);
       visibilityObserver.disconnect();
       resizeObserver.disconnect();
-      container.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointermove', onPointerMove);
       material.dispose();
       geometry.dispose();
       renderer.dispose();
