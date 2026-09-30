@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowRight,
   ArrowUpRight,
@@ -9,6 +9,8 @@ import Dither from '../react-bits/Dither';
 import FloodComparisonViewer from './FloodComparisonViewer';
 
 export const HeroSection: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="relative min-h-[96vh] flex flex-col justify-center pt-24 pb-12 overflow-hidden bg-[#EBE8E0] text-[#181A1E]">
       {/* React Bits Dither Wave Background Animation for Homepage First Page */}
@@ -38,10 +40,10 @@ export const HeroSection: React.FC = () => {
       {/* Background Topographic Texture */}
       <div className="absolute inset-0 pointer-events-none light-contour-lines opacity-20 z-0" />
 
-      {/* Main Container - Expansive across Ultra-wide and 55" TV Screens */}
-      <div className="relative z-10 max-w-7xl 2xl:max-w-[1680px] 3xl:max-w-[1980px] 4xl:max-w-[2400px] mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        {/* DESKTOP HERO ARCHITECTURE (>= 1024px) - EXACT REFERENCE MATCH */}
-        <div className="hidden lg:block relative w-full h-[690px] 2xl:h-[750px]">
+      {/* Main Container - Exact Default Proportions for Homepage */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        {/* DESKTOP HERO ARCHITECTURE (>= 1024px) - EXACT DEFAULT REFERENCE MATCH */}
+        <div className="hidden lg:block relative w-full h-[690px]">
           {/* 1. OUTSIDE TOP-LEFT NOTCH (Sitting in the upper-left cutout) */}
           <div className="absolute top-0 left-2 z-30 max-w-xl select-none">
             {/* Official Smart India Hackathon 2026 Accreditation Tag */}
@@ -76,9 +78,11 @@ export const HeroSection: React.FC = () => {
             </div>
           </div>
 
-          {/* 2. THE CENTER DARK CURVED FRAME */}
+          {/* 2. THE CENTER DARK CURVED FRAME - Click to open 3D Map */}
           <div
-            className="absolute inset-0 z-10 bg-[#0B0D11] border border-[#262830] shadow-2xl overflow-hidden"
+            onClick={() => navigate('/app/map')}
+            className="absolute inset-0 z-10 bg-[#0B0D11] border border-[#262830] shadow-2xl overflow-hidden cursor-pointer"
+            title="Click image to enter 3D Map"
             style={{
               clipPath: 'url(#heroOrganicFrameClip)',
               WebkitClipPath: 'url(#heroOrganicFrameClip)',
@@ -201,8 +205,12 @@ export const HeroSection: React.FC = () => {
             </div>
           </div>
 
-          {/* Mobile Center Comparison Frame */}
-          <div className="relative w-full h-[460px] rounded-[2.5rem] bg-[#0B0D11] border border-[#262830] shadow-xl overflow-hidden">
+          {/* Mobile Center Comparison Frame - Click to open 3D Map */}
+          <div
+            onClick={() => navigate('/app/map')}
+            className="relative w-full h-[460px] rounded-[2.5rem] bg-[#0B0D11] border border-[#262830] shadow-xl overflow-hidden cursor-pointer"
+            title="Click image to enter 3D Map"
+          >
             <FloodComparisonViewer />
 
             {/* Mobile Top Stats */}
