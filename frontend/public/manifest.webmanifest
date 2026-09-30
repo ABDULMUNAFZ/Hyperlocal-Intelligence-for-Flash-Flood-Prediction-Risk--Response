@@ -7,8 +7,8 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0d2b59",
-  "theme_color": "#0d2b59",
+  "background_color": "#181A1E",
+  "theme_color": "#181A1E",
   "lang": "en-IN",
   "categories": ["utilities", "weather", "navigation"],
   "icons": [
