@@ -36,9 +36,15 @@ async def main() -> int:
     ap.add_argument("--role", choices=["admin", "disaster_manager"], default="disaster_manager")
     ap.add_argument("--name", default="FloodGuard Responder")
     ap.add_argument("--generate-dev-password", action="store_true")
+    ap.add_argument("--password-secret", help="production: read the password from this AWS Secrets Manager secret "
+                                             "(JSON key 'password'); nothing is printed or passed on the command line")
     args = ap.parse_args()
 
-    if args.generate_dev_password:
+    if args.password_secret:
+        import boto3
+
+        password = json.loads(boto3.client("secretsmanager").get_secret_value(SecretId=args.password_secret)["SecretString"])["password"]
+    elif args.generate_dev_password:
         password = secrets.token_urlsafe(18)
     else:
         password = getpass.getpass("Password (min 12 chars): ")

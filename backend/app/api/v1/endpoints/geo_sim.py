@@ -125,8 +125,7 @@ async def _record(req: SimRequest, result: Dict[str, Any], zone) -> Optional[str
         return None
 
 
-@router.post("/simulate")
-async def simulate(req: SimRequest):
+def _validate_zone(req: SimRequest):
     try:
         zone = shape(req.geometry)
     except Exception:
@@ -136,8 +135,81 @@ async def simulate(req: SimRequest):
     zone_km2 = osm.geom_area_km2(zone)
     if zone_km2 > 40:
         raise HTTPException(400, f"Zone is {zone_km2:.1f} km²; simulation is limited to 40 km² micro-zones.")
+    return zone, zone_km2
 
-    key = TTLCache.key("sim-v5", json.dumps(req.geometry, sort_keys=True), req.model_dump(exclude={"name", "geometry"}))
+
+def _sim_key(req: SimRequest) -> str:
+    return TTLCache.key("sim-v5", json.dumps(req.geometry, sort_keys=True), req.model_dump(exclude={"name", "geometry"}))
+
+
+# ------------------------------------------------------------------------------------------------ async jobs
+# A cold simulation can take minutes (terrain + OSM + soil fetches, then the 2-D solver). Behind HTTPS
+# edges such as CloudFront a single response is capped (60 s), so clients start a job and poll it.
+# Job state lives in Redis so any API worker/task can answer the poll.
+_JOB_TTL_S = 2 * 3600
+_JOB_LOST_AFTER_S = 20 * 60
+_job_tasks: set = set()
+
+
+async def _job_redis():
+    from app.api.v1.endpoints.live import broker
+
+    return await broker.redis()
+
+
+@router.post("/simulate/jobs", status_code=202)
+async def simulate_job(req: SimRequest):
+    """Start a simulation in the background; poll GET /geo/simulate/jobs/{job_id}."""
+    _validate_zone(req)  # invalid zones fail immediately with 400
+    cached = _sim_cache.get(_sim_key(req))
+    if cached:
+        return {"job_id": None, "status": "done", "result": cached}
+    import uuid
+
+    from fastapi.encoders import jsonable_encoder
+
+    job_id = uuid.uuid4().hex
+    r = await _job_redis()
+    started = datetime.now(timezone.utc)
+    await r.set(f"fg:simjob:{job_id}", json.dumps({"status": "running", "started_at": started.isoformat()}), ex=_JOB_TTL_S)
+
+    async def run() -> None:
+        try:
+            payload = {"status": "done", "result": jsonable_encoder(await simulate(req))}
+        except HTTPException as exc:
+            payload = {"status": "error", "http_status": exc.status_code, "error": exc.detail}
+        except Exception as exc:  # noqa: BLE001
+            logger.exception("simulation job %s failed", job_id)
+            payload = {"status": "error", "http_status": 500, "error": f"Simulation failed: {exc}"}
+        payload["started_at"] = started.isoformat()
+        payload["elapsed_s"] = round((datetime.now(timezone.utc) - started).total_seconds(), 1)
+        await r.set(f"fg:simjob:{job_id}", json.dumps(payload, default=str), ex=_JOB_TTL_S)
+
+    task = asyncio.create_task(run())
+    _job_tasks.add(task)
+    task.add_done_callback(_job_tasks.discard)
+    return {"job_id": job_id, "status": "running", "started_at": started.isoformat()}
+
+
+@router.get("/simulate/jobs/{job_id}")
+async def simulate_job_status(job_id: str):
+    raw = await (await _job_redis()).get(f"fg:simjob:{job_id}")
+    if not raw:
+        raise HTTPException(404, "Unknown or expired simulation job")
+    job = json.loads(raw)
+    if job["status"] == "running":
+        elapsed = (datetime.now(timezone.utc) - datetime.fromisoformat(job["started_at"])).total_seconds()
+        job["elapsed_s"] = round(elapsed, 1)
+        if elapsed > _JOB_LOST_AFTER_S:  # the process running it was restarted
+            return {"status": "error", "http_status": 503, "error": "Simulation job was interrupted (server restart). Please run it again."}
+    return job
+
+
+@router.post("/simulate")
+async def simulate(req: SimRequest):
+    zone, zone_km2 = _validate_zone(req)
+
+    key = _sim_key(req)
     cached = _sim_cache.get(key)
     if cached:
         return cached

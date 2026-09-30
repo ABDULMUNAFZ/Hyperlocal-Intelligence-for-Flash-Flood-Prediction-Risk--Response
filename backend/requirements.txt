@@ -24,6 +24,7 @@ asyncpg==0.29.0
 redis==5.0.1
 celery==5.4.0
 pywebpush==2.5.0  # Web Push (VAPID) emergency notifications
+boto3==1.35.36  # S3: production model artifacts
 flower==2.0.1
 
 # Geospatial

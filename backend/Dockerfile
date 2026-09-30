@@ -36,19 +36,33 @@ ENV PYTHONPATH=/app
 ENV PYTHONUNBUFFERED=1
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 
-# Production stage
+# Production stage (Amazon ECS/Fargate). Same image runs the API, Celery worker, Celery beat
+# and one-off tasks (db bootstrap) — the command is chosen by the ECS task definition.
 FROM base AS production
 
-# Create non-root user
-RUN groupadd -r floodguard && useradd -r -g floodguard floodguard
+# Non-root runtime user with a fixed UID
+RUN groupadd -r -g 10001 floodguard && useradd -r -u 10001 -g floodguard -d /app -s /usr/sbin/nologin floodguard
 
 COPY --chown=floodguard:floodguard . .
+# writable dirs: geo cache (ephemeral) and model artifacts fetched from S3 at start
+RUN chmod 0755 docker-entrypoint.sh && mkdir -p .cache models/trained && chown -R floodguard:floodguard .cache models
 
 USER floodguard
 
-ENV PYTHONPATH=/app
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    ENVIRONMENT=production \
+    LOG_LEVEL=INFO \
+    PORT=8000 \
+    WEB_CONCURRENCY=2
 
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+HEALTHCHECK --interval=30s --timeout=5s --start-period=90s --retries=3 \
+    CMD curl -fsS "http://127.0.0.1:${PORT}/health" || exit 1
+
+ENTRYPOINT ["./docker-entrypoint.sh"]
+# uvicorn production server: multiple workers, proxy headers from the load balancer,
+# graceful shutdown on SIGTERM (ECS stopTimeout), keep-alive above the ALB idle timeout
+CMD ["sh", "-c", "exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT} --workers ${WEB_CONCURRENCY} --proxy-headers --forwarded-allow-ips='*' --timeout-graceful-shutdown 25 --timeout-keep-alive 130 --no-server-header"]

@@ -71,6 +71,10 @@ async def init_db() -> None:
     from app.models import live, emergency  # noqa: F401  (live ops + emergency response tables)
 
     async with engine.begin() as conn:
+        # Serialize schema setup across processes: production runs several uvicorn workers (and tasks)
+        # that start at the same time; concurrent CREATE TYPE/TABLE races on pg_type otherwise.
+        # Transaction-scoped lock, released automatically at commit.
+        await conn.execute(text("SELECT pg_advisory_xact_lock(7240611)"))
         # Create missing tables only. (Previously every startup dropped ALL tables, which wiped
         # users, alerts and reports on each dev-server reload.) checkfirst=True skips existing
         # tables, so their indexes are not re-created.

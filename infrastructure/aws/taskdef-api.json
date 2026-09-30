@@ -1,0 +1,135 @@
+{
+  "family": "floodguard-api",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "1024",
+  "memory": "3072",
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  },
+  "executionRoleArn": "${EXEC_ROLE}",
+  "taskRoleArn": "${TASK_ROLE}",
+  "ephemeralStorage": {
+    "sizeInGiB": 21
+  },
+  "containerDefinitions": [
+    {
+      "name": "api",
+      "image": "${IMAGE}",
+      "essential": true,
+      "environment": [
+        {
+          "name": "ENVIRONMENT",
+          "value": "production"
+        },
+        {
+          "name": "LOG_LEVEL",
+          "value": "INFO"
+        },
+        {
+          "name": "POSTGRES_HOST",
+          "value": "${DB_HOST}"
+        },
+        {
+          "name": "POSTGRES_PORT",
+          "value": "5432"
+        },
+        {
+          "name": "POSTGRES_USER",
+          "value": "fgadmin"
+        },
+        {
+          "name": "POSTGRES_DB",
+          "value": "floodguard"
+        },
+        {
+          "name": "REDIS_URL",
+          "value": "rediss://${REDIS_HOST}:6379/0?ssl_cert_reqs=required"
+        },
+        {
+          "name": "CORS_ORIGINS",
+          "value": "[\"${FRONTEND_ORIGIN}\"]"
+        },
+        {
+          "name": "CORS_ORIGIN_REGEX",
+          "value": "${CORS_REGEX}"
+        },
+        {
+          "name": "MODEL_ARTIFACTS_S3_URI",
+          "value": "s3://${BUCKET}/models"
+        },
+        {
+          "name": "VAPID_SUBJECT",
+          "value": "${FRONTEND_ORIGIN}"
+        },
+        {
+          "name": "EMERGENCY_AUTO_OFFICIAL_ALERTS",
+          "value": "true"
+        },
+        {
+          "name": "WEB_CONCURRENCY",
+          "value": "2"
+        },
+        {
+          "name": "PORT",
+          "value": "8000"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "SECRET_KEY",
+          "valueFrom": "${SECRET_ARN}:SECRET_KEY::"
+        },
+        {
+          "name": "POSTGRES_PASSWORD",
+          "valueFrom": "${SECRET_ARN}:POSTGRES_PASSWORD::"
+        },
+        {
+          "name": "VAPID_PUBLIC_KEY",
+          "valueFrom": "${SECRET_ARN}:VAPID_PUBLIC_KEY::"
+        },
+        {
+          "name": "VAPID_PRIVATE_KEY",
+          "valueFrom": "${SECRET_ARN}:VAPID_PRIVATE_KEY::"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/floodguard",
+          "awslogs-region": "${REGION}",
+          "awslogs-stream-prefix": "api"
+        }
+      },
+      "stopTimeout": 30,
+      "readonlyRootFilesystem": false,
+      "user": "10001:10001",
+      "portMappings": [
+        {
+          "containerPort": 8000,
+          "protocol": "tcp",
+          "name": "http"
+        }
+      ],
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "curl -fsS http://127.0.0.1:8000/health || exit 1"
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 120
+      }
+    }
+  ],
+  "tags": [
+    {
+      "key": "Project",
+      "value": "floodguard"
+    }
+  ]
+}

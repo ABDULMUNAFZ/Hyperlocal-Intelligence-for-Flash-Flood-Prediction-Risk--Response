@@ -109,7 +109,21 @@ export const liveApi = {
   deleteMyReport: async (id: string) => (await live.delete(`/live/reports/${id}`, { params: { session_token: sessionToken() } })).data,
   allReports: async () => (await live.get<{ reports: CitizenReport[] }>('/live/reports')).data.reports,
   updateReport: async (id: string, status: string) => (await live.patch<CitizenReport>(`/live/reports/${id}`, { status })).data,
-  simulate: async (body: Record<string, any>) => (await api.post<any>('/geo/simulate', body, LONG)).data,
+  /** Runs a scenario as a background job (cold runs can take minutes) and polls until it finishes. */
+  simulate: async (body: Record<string, any>) => {
+    const start = (await api.post<any>('/geo/simulate/jobs', body)).data;
+    if (start.status === 'done') return start.result;
+    const t0 = Date.now();
+    while (Date.now() - t0 < 15 * 60_000) {
+      await new Promise((r) => setTimeout(r, 2500));
+      const job = (await api.get<any>(`/geo/simulate/jobs/${start.job_id}`)).data;
+      if (job.status === 'done') return job.result;
+      if (job.status === 'error') {
+        throw Object.assign(new Error(typeof job.error === 'string' ? job.error : 'Simulation failed'), { response: { status: job.http_status ?? 500, data: { detail: job.error } } });
+      }
+    }
+    throw new Error('Simulation did not finish within 15 minutes');
+  },
   simRoutes: async (simId: string, origin: LngLat, candidates: any[]) =>
     (await api.post<any>(`/geo/simulate/${simId}/routes`, { origin, candidates }, LONG)).data,
   riskSigns: async (points: Array<{ id: string; name: string; lon: number; lat: number }>) =>

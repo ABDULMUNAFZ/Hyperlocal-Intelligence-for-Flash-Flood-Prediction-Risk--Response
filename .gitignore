@@ -226,3 +226,6 @@ backend/.cache/
 id_rsa*
 # Vite dev cache
 frontend/.vite/
+
+# Vercel CLI link
+.vercel/

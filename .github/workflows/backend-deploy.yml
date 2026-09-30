@@ -1,0 +1,90 @@
+# Backend: GitHub → Docker build → Amazon ECR → ECS/Fargate (api, celery worker, celery beat)
+# Auth: GitHub OIDC → IAM role (no long-lived AWS keys in GitHub).
+# Repository variables (not secrets): AWS_DEPLOY_ROLE_ARN, AWS_REGION
+name: backend-deploy
+
+on:
+  push:
+    branches: [main]
+    paths: ["backend/**", "infrastructure/aws/**", ".github/workflows/backend-deploy.yml"]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: backend-deploy
+  cancel-in-progress: false
+
+env:
+  ECR_REPOSITORY: floodguard-backend
+  CLUSTER: floodguard-prod
+
+jobs:
+  deploy:
+    if: ${{ vars.AWS_DEPLOY_ROLE_ARN != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION || 'ap-south-1' }}
+
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build and push production image
+        uses: docker/build-push-action@v6
+        with:
+          context: backend
+          target: production
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+            ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Register task definitions with the new image
+        id: td
+        env:
+          IMAGE: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+        run: |
+          for svc in api worker beat; do
+            aws ecs describe-task-definition --task-definition floodguard-$svc --query taskDefinition --output json \
+              | jq --arg img "$IMAGE" '.containerDefinitions[0].image=$img
+                  | del(.taskDefinitionArn,.revision,.status,.requiresAttributes,.compatibilities,.registeredAt,.registeredBy)' > td-$svc.json
+            aws ecs register-task-definition --cli-input-json file://td-$svc.json --query taskDefinition.taskDefinitionArn --output text
+          done
+
+      - name: Run database migrations (one-off Fargate task)
+        run: |
+          NET=$(aws ecs describe-services --cluster $CLUSTER --services floodguard-api \
+                --query 'services[0].networkConfiguration.awsvpcConfiguration' --output json)
+          ARN=$(aws ecs run-task --cluster $CLUSTER --launch-type FARGATE --task-definition floodguard-api \
+                --network-configuration "{\"awsvpcConfiguration\":$NET}" \
+                --overrides '{"containerOverrides":[{"name":"api","command":["python","scripts/db_bootstrap.py"],"environment":[{"name":"SKIP_MODEL_FETCH","value":"1"}]}]}' \
+                --query 'tasks[0].taskArn' --output text)
+          aws ecs wait tasks-stopped --cluster $CLUSTER --tasks "$ARN"
+          CODE=$(aws ecs describe-tasks --cluster $CLUSTER --tasks "$ARN" --query 'tasks[0].containers[0].exitCode' --output text)
+          echo "migration exit code: $CODE"; test "$CODE" = "0"
+
+      - name: Deploy services
+        run: |
+          for svc in api worker beat; do
+            aws ecs update-service --cluster $CLUSTER --service floodguard-$svc --task-definition floodguard-$svc --force-new-deployment >/dev/null
+          done
+          aws ecs wait services-stable --cluster $CLUSTER --services floodguard-api floodguard-worker floodguard-beat
+
+      - name: Verify live health
+        if: ${{ vars.API_BASE_URL != '' }}
+        run: |
+          curl -fsS "${{ vars.API_BASE_URL }}/health"
+          curl -fsS "${{ vars.API_BASE_URL }}/api/v1/health" | jq '{status, checks: (.checks | map_values(.status))}'

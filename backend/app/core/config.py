@@ -136,6 +136,9 @@ class Settings(BaseSettings):
         "http://127.0.0.1:5173",
         "http://127.0.0.1:3000",
     ]
+    # Optional regex for additional origins, e.g. Vercel preview deployments of this project:
+    # ^https://floodguard(-[a-z0-9-]+)?\.vercel\.app$   (set CORS_ORIGINS as a JSON list in production)
+    CORS_ORIGIN_REGEX: Optional[str] = None
 
     # Rate Limiting
     RATE_LIMIT_REQUESTS: int = 100

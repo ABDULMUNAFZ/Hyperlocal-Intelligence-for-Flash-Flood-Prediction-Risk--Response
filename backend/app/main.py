@@ -57,6 +57,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
+    allow_origin_regex=settings.CORS_ORIGIN_REGEX,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -75,6 +76,12 @@ class SelectiveGZipMiddleware:
 
 
 app.add_middleware(SelectiveGZipMiddleware, minimum_size=1000)
+
+@app.get("/health", tags=["Health"], include_in_schema=False)
+async def root_health():
+    """Liveness for container / load-balancer checks (no dependencies). Full checks: /api/v1/health."""
+    return {"status": "ok", "service": "floodguard-api"}
+
 
 # Include routers
 app.include_router(health.router, prefix="/api/v1")
