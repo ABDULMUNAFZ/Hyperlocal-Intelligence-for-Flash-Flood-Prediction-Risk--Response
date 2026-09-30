@@ -159,10 +159,7 @@ export const SignalsConvergenceSection: React.FC = () => {
   const [selectedSignal, setSelectedSignal] = useState<SignalItem>(SIGNALS[0]);
 
   return (
-    <section id="signals" className="relative py-20 sm:py-28 bg-[#131417] border-t border-[#262830] text-[#FAF9F6] overflow-hidden">
-      {/* Background Subtle Convergence Lines */}
-      <div className="absolute inset-0 pointer-events-none opacity-10 bg-[radial-gradient(#D4F826_1px,transparent_1px)] [background-size:24px_24px]" />
-
+    <section id="signals" className="relative py-20 sm:py-28 pattern-radar-rings border-t border-[#262830] text-[#FAF9F6] overflow-hidden">
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Animated Scroll Heading with Multi-Sensor Convergence Accent */}
         <ScrollHeading
@@ -176,45 +173,56 @@ export const SignalsConvergenceSection: React.FC = () => {
 
         {/* Convergence Architecture Flow */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          {/* Signal Stream Chips (5 cols) */}
+          {/* Signal Stream Chips (5 cols) - Telemetry Rack Architecture */}
           <div className="lg:col-span-5 space-y-2.5">
             <div className="text-xs font-mono text-slate-400 flex items-center justify-between pb-2 border-b border-white/10">
-              <span className="flex items-center gap-1.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#D4F826]"></span>
-                <span>INCOMING DATA FEEDS (11 LAYERS)</span>
+              <span className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-[#D4F826] animate-pulse"></span>
+                <span className="font-bold tracking-wider text-white">SECTION 02 · SENSOR TELEMETRY RACK (11 BUS CHANNELS)</span>
               </span>
-              <span className="text-[10px]">CLICK TO INSPECT</span>
+              <span className="text-[10px] text-[#D4F826] font-mono">LIVE FEED</span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2 max-h-[520px] overflow-y-auto pr-1 no-scrollbar">
-              {SIGNALS.map((sig) => {
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2.5 max-h-[540px] overflow-y-auto pr-1 no-scrollbar">
+              {SIGNALS.map((sig, idx) => {
                 const Icon = sig.icon;
                 const isSelected = selectedSignal.id === sig.id;
                 return (
                   <button
                     key={sig.id}
                     onClick={() => setSelectedSignal(sig)}
-                    className={`flex items-center justify-between p-3.5 rounded-2xl border text-left transition-all ${
+                    className={`group relative flex items-center justify-between p-3.5 rounded-2xl border text-left transition-all ${
                       isSelected
-                        ? 'bg-[#1E2028] border-[#D4F826] shadow-lg shadow-black/40 text-white'
-                        : 'bg-[#181A20] border-white/10 hover:bg-[#20232B] text-slate-300'
+                        ? 'bg-[#1E2028] border-[#D4F826] shadow-xl shadow-black/50 text-white translate-x-1'
+                        : 'bg-[#15171C]/90 border-[#2A2E39] hover:border-white/30 hover:bg-[#1C1F26] text-slate-300'
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <div
-                        className={`p-2 rounded-xl transition-colors ${
-                          isSelected ? 'bg-[#D4F826] text-[#181A1E]' : 'bg-white/10 text-white'
+                        className={`p-2.5 rounded-xl transition-all ${
+                          isSelected ? 'bg-[#D4F826] text-[#181A1E] shadow-[0_0_12px_rgba(212,248,38,0.4)]' : 'bg-white/10 text-white group-hover:scale-110'
                         }`}
                       >
                         <Icon className="h-4 w-4" />
                       </div>
                       <div>
-                        <div className="text-xs font-bold leading-tight">{sig.name}</div>
-                        <div className="text-[10px] font-mono text-slate-400 mt-0.5">{sig.source}</div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold leading-tight">{sig.name}</span>
+                          <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-white/10 text-slate-400">CH-0{idx + 1}</span>
+                        </div>
+                        <div className="text-[10px] font-mono text-slate-400 mt-0.5">{sig.source} · <span className="text-[#D4F826]/80">{sig.freq}</span></div>
                       </div>
                     </div>
 
-                    <DataHonestyBadge kind={sig.status} size="sm" />
+                    <div className="flex items-center gap-2">
+                      {/* Mini Oscilloscope Waveform on Hover / Select */}
+                      <div className="hidden sm:flex items-center gap-0.5 h-4 w-8 px-1">
+                        <span className={`w-1 rounded-full bg-[#D4F826] ${isSelected ? 'h-3 animate-pulse' : 'h-1 group-hover:h-2'}`} />
+                        <span className={`w-1 rounded-full bg-[#D4F826] ${isSelected ? 'h-4 animate-pulse' : 'h-1.5 group-hover:h-3'}`} />
+                        <span className={`w-1 rounded-full bg-[#D4F826] ${isSelected ? 'h-2 animate-pulse' : 'h-1 group-hover:h-1.5'}`} />
+                      </div>
+                      <DataHonestyBadge kind={sig.status} size="sm" />
+                    </div>
                   </button>
                 );
               })}

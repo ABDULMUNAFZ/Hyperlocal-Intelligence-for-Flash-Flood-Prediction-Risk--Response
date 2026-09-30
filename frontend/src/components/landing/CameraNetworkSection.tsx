@@ -123,8 +123,13 @@ export const CameraNetworkSection: React.FC = () => {
   const [activeCam, setActiveCam] = useState<CameraNode>(CAMERAS[1]);
 
   return (
-    <section id="cameras" className="relative py-20 sm:py-28 bg-[#121316] border-t border-[#262830] text-[#FAF9F6] overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="cameras" className="relative py-20 sm:py-28 pattern-cctv-matrix border-t border-[#262830] text-[#FAF9F6] overflow-hidden">
+      {/* CCTV Scanline Sweep Animation */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-25">
+        <div className="w-full h-1 bg-[#D4F826] shadow-[0_0_8px_#D4F826] animate-scanline-drop" />
+      </div>
+
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Animated Scroll Heading with Optical Viewfinder Crosshair Accent */}
         <ScrollHeading
           theme="dark"
@@ -150,15 +155,15 @@ export const CameraNetworkSection: React.FC = () => {
           {/* Camera Selection List & Stylized Wayanad Map (6 cols) */}
           <div className="lg:col-span-6 space-y-4">
             <div className="flex items-center justify-between text-xs font-mono text-slate-400 pb-2 border-b border-white/10">
-              <span className="flex items-center gap-1.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#D4F826]"></span>
-                <span>STRATEGIC DEPLOYMENT BLUEPRINT (6 NODES)</span>
+              <span className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-[#D4F826] animate-pulse"></span>
+                <span className="text-white font-bold tracking-wider uppercase">SECTION 04 · STRATEGIC CCTV SENSOR NODES (6 CHOKEPOINTS)</span>
               </span>
-              <span>WAYANAD DISTRICT</span>
+              <span className="text-[10px] text-[#D4F826] font-mono">OPTICAL HUD</span>
             </div>
 
-            {/* Stylized Node Placement Map - Tactical Dark Card */}
-            <div className="relative w-full aspect-[16/9] bg-[#181A22] rounded-3xl border border-[#2E3240] p-4 overflow-hidden shadow-2xl">
+            {/* Stylized Node Placement Map - Tactical CCTV Frame */}
+            <div className="relative w-full aspect-[16/9] bg-[#14161C] rounded-3xl border-2 border-white/15 p-4 overflow-hidden shadow-2xl group hover:border-[#D4F826] transition-all">
               {/* Background Topo Curves */}
               <div className="absolute inset-0 light-contour-lines opacity-10 pointer-events-none" />
 

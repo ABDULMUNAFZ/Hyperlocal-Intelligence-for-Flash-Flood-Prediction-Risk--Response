@@ -85,7 +85,7 @@ export const SimulationSection: React.FC = () => {
   const [selectedScenario, setSelectedScenario] = useState<ScenarioConfig>(SCENARIOS[1]);
 
   return (
-    <section id="simulation" className="relative py-20 sm:py-28 bg-[#0E1015] border-t border-[#262830] text-[#FAF9F6] overflow-hidden">
+    <section id="simulation" className="relative py-20 sm:py-28 pattern-fluid-chamber border-t border-[#262830] text-[#FAF9F6] overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Animated Scroll Heading with Scenario Simulation Accent */}
         <ScrollHeading
@@ -98,10 +98,10 @@ export const SimulationSection: React.FC = () => {
         />
 
         {/* Scenario Controls Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-3xl bg-[#181A22] border border-[#2E3240] mb-8 shadow-xl">
+        <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-3xl bg-[#14161E]/95 border-2 border-white/15 mb-8 shadow-2xl">
           <div className="flex items-center gap-2 text-xs font-mono text-white font-bold">
-            <Sliders className="h-4 w-4 text-[#D4F826]" />
-            <span>SELECT SIMULATION SCENARIO:</span>
+            <span className="h-2 w-2 rounded-full bg-[#D4F826] animate-pulse"></span>
+            <span className="tracking-wider uppercase">SECTION 07 · SELECT HYDRAULIC WAVEFRONT SCENARIO:</span>
           </div>
 
           <div className="flex flex-wrap gap-2">

@@ -130,7 +130,7 @@ export const MobileJourneySection: React.FC = () => {
   };
 
   return (
-    <section id="mobile-journey" className="relative py-20 sm:py-28 bg-white border-t border-[#DDD9CE] text-[#181A1E] overflow-hidden">
+    <section id="mobile-journey" className="relative py-20 sm:py-28 pattern-mobile-pathway border-t border-[#DDD9CE] text-[#181A1E] overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header (Authentic Clinical Capsule Style) */}
         <div className="max-w-3xl mb-10 space-y-3.5">
@@ -141,7 +141,7 @@ export const MobileJourneySection: React.FC = () => {
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-[#9BBD00]"></span>
               </span>
               <span className="text-[11px] font-mono font-semibold tracking-wider uppercase">
-                CITIZEN LIFELINE · RAPID EVACUATION LOOP
+                SECTION 08 · CITIZEN LIFELINE · RAPID EVACUATION LOOP
               </span>
             </div>
             <span className="text-[10px] font-mono text-[#7A7D87] border-l border-[#DDD9CE] pl-2 hidden sm:inline">

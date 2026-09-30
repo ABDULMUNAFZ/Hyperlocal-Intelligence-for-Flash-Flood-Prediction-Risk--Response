@@ -84,7 +84,7 @@ export const WeatherSatelliteSection: React.FC = () => {
   ];
 
   return (
-    <section id="weather" className="relative py-20 sm:py-28 bg-[#F4F2EB] border-t border-[#DDD9CE] text-[#23252A] overflow-hidden">
+    <section id="weather" className="relative py-20 sm:py-28 pattern-telemetry-mesh border-t border-[#DDD9CE] text-[#23252A] overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Animated Scroll Heading with Radar Sweep Accent */}
         <ScrollHeading
@@ -98,8 +98,10 @@ export const WeatherSatelliteSection: React.FC = () => {
         {/* Timeline Selector */}
         <div className="flex items-center justify-between flex-wrap gap-4 pb-6 border-b border-[#EAE7DF]">
           <div className="flex items-center gap-2">
-            <Clock className="h-4 w-4 text-violet-700" />
-            <span className="text-xs font-mono text-[#141518] font-bold">TEMPORAL RADAR TIMELINE:</span>
+            <Clock className="h-4 w-4 text-[#181A1E]" />
+            <span className="text-xs font-mono text-[#141518] font-black uppercase">
+              SECTION 03 · TEMPORAL RADAR SWEEP TIMELINE:
+            </span>
           </div>
 
           <div className="inline-flex items-center p-1 rounded-full bg-white border border-[#E6E4DE] gap-1 shadow-xs">
@@ -111,7 +113,7 @@ export const WeatherSatelliteSection: React.FC = () => {
                   onClick={() => setSelectedTimeline(step.id as any)}
                   className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all ${
                     isActive
-                      ? 'bg-[#141518] text-white font-bold shadow-xs'
+                      ? 'bg-[#141518] text-[#D4F826] font-bold shadow-xs'
                       : 'text-[#4A4D54] hover:text-[#141518] hover:bg-[#F2EFF7]'
                   }`}
                 >
@@ -132,14 +134,17 @@ export const WeatherSatelliteSection: React.FC = () => {
 
         {/* Main Observation Dashboard */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
-          {/* Radar Screen (7 cols) - White Porcelain Card */}
-          <div className="lg:col-span-7 bg-white rounded-3xl border border-[#E6E4DE] p-6 shadow-sm relative overflow-hidden">
+          {/* Radar Screen (7 cols) - Aviation Radar Cockpit Frame */}
+          <div className="lg:col-span-7 bg-white rounded-3xl border-2 border-[#181A1E]/15 p-6 shadow-xl relative overflow-hidden group hover:border-[#181A1E] transition-all">
             <div className="flex items-center justify-between pb-4 border-b border-[#EAE7DF] mb-6 text-xs font-mono">
-              <span className="text-[#141518] flex items-center gap-1.5 font-bold">
-                <Radio className="h-4 w-4 text-violet-700 animate-pulse" />
-                WAYANAD DOPPLER RADAR REFLECTIVITY ({timelineSteps.find(s => s.id === selectedTimeline)?.radarDbz} dBZ)
+              <span className="text-[#141518] flex items-center gap-2 font-black tracking-wider uppercase">
+                <span className="flex h-2.5 w-2.5 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D4F826] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#181A1E]"></span>
+                </span>
+                RADAR REFLECTIVITY PPI SCAN ({timelineSteps.find(s => s.id === selectedTimeline)?.radarDbz} dBZ)
               </span>
-              <span className="text-[#6A6D75]">COORDINATE: 11.6854°N, 76.1320°E</span>
+              <span className="text-[#6A6D75] font-mono text-[11px]">COORDINATE: 11.6854°N, 76.1320°E</span>
             </div>
 
             {/* Radar Screen Container */}

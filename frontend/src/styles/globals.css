@@ -446,6 +446,109 @@ body {
   background-size: auto, auto, 28px 28px, 28px 28px;
 }
 
+/* ── Authentic High-Tech Background Patterns for 01-09 Sections ── */
+
+/* Pattern 1: High-Precision Topographic Iso-Contour Grid (Mountain Section) */
+.pattern-topo-grid {
+  background-color: #FAF9F6;
+  background-image:
+    radial-gradient(circle at 85% 15%, rgba(212, 248, 38, 0.12) 0%, transparent 50%),
+    radial-gradient(circle at 15% 85%, rgba(190, 180, 210, 0.2) 0%, transparent 45%),
+    linear-gradient(to right, rgba(0, 0, 0, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.035) 1px, transparent 1px);
+  background-size: auto, auto, 32px 32px, 32px 32px;
+}
+
+/* Pattern 2: Tactical Radar Polar Sweep Grid (Signals Section) */
+.pattern-radar-rings {
+  background-color: #121316;
+  background-image:
+    radial-gradient(circle at 50% 50%, transparent 0, transparent 75px, rgba(212, 248, 38, 0.06) 76px, transparent 77px),
+    radial-gradient(circle at 50% 50%, transparent 0, transparent 160px, rgba(212, 248, 38, 0.04) 161px, transparent 162px),
+    radial-gradient(circle at 50% 50%, transparent 0, transparent 260px, rgba(255, 255, 255, 0.03) 261px, transparent 262px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 64px 64px, 64px 64px;
+}
+
+/* Pattern 3: Meteorological Telemetry Mesh (Weather Satellite Section) */
+.pattern-telemetry-mesh {
+  background-color: #F4F2EB;
+  background-image:
+    radial-gradient(circle at 30% 20%, rgba(212, 248, 38, 0.12) 0%, transparent 45%),
+    linear-gradient(to right, rgba(24, 26, 30, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(24, 26, 30, 0.03) 1px, transparent 1px),
+    radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+  background-size: auto, 24px 24px, 24px 24px, 8px 8px;
+}
+
+/* Pattern 4: CCTV Optical Edge Matrix (Camera Network Section) */
+.pattern-cctv-matrix {
+  background-color: #0E1014;
+  background-image:
+    linear-gradient(rgba(212, 248, 38, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212, 248, 38, 0.03) 1px, transparent 1px),
+    radial-gradient(circle at 50% 50%, rgba(225, 29, 72, 0.04) 0%, transparent 60%);
+  background-size: 28px 28px, 28px 28px, auto;
+}
+
+/* Pattern 5: Official Triage Blueprint Paper (Human-In-The-Loop Section) */
+.pattern-triage-blueprint {
+  background-color: #FAFAF7;
+  background-image:
+    linear-gradient(to right, rgba(28, 30, 36, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(28, 30, 36, 0.035) 1px, transparent 1px),
+    radial-gradient(circle at 90% 10%, rgba(212, 248, 38, 0.08) 0%, transparent 40%);
+  background-size: 20px 20px, 20px 20px, auto;
+}
+
+/* Pattern 6: Hydraulic Simulation Fluid Mesh (Simulation Section) */
+.pattern-fluid-chamber {
+  background-color: #0A0C10;
+  background-image:
+    radial-gradient(circle at 50% 100%, rgba(59, 130, 246, 0.15) 0%, transparent 60%),
+    radial-gradient(circle at 0% 0%, rgba(212, 248, 38, 0.06) 0%, transparent 35%),
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: auto, auto, 40px 40px, 40px 40px;
+}
+
+/* Pattern 7: Mobile Journey Pathway (Citizen App Section) */
+.pattern-mobile-pathway {
+  background-color: #FFFFFF;
+  background-image:
+    radial-gradient(circle at 50% 20%, rgba(212, 248, 38, 0.08) 0%, transparent 45%),
+    linear-gradient(to right, rgba(0, 0, 0, 0.025) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.025) 1px, transparent 1px);
+  background-size: auto, 30px 30px, 30px 30px;
+}
+
+/* Micro-Animations for Distinct Cards */
+@keyframes radar-arm {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.animate-radar-arm {
+  animation: radar-arm 3.5s linear infinite;
+  transform-origin: center center;
+}
+
+@keyframes scanline-drop {
+  0% { top: -20%; }
+  100% { top: 120%; }
+}
+.animate-scanline-drop {
+  animation: scanline-drop 4s linear infinite;
+}
+
+@keyframes water-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+.animate-water-pulse {
+  animation: water-pulse 2s ease-in-out infinite;
+}
+
 .light-contour-lines {
   background-image: repeating-radial-gradient(circle at 50% 60%, transparent 0, transparent 40px, rgba(0, 0, 0, 0.02) 41px, rgba(0, 0, 0, 0.02) 42px);
 }

@@ -47,7 +47,7 @@ export const HumanInTheLoopSection: React.FC = () => {
   };
 
   return (
-    <section id="human" className="relative py-20 sm:py-28 bg-white border-t border-[#DDD9CE] text-[#181A1E] overflow-hidden">
+    <section id="human" className="relative py-20 sm:py-28 pattern-triage-blueprint border-t border-[#DDD9CE] text-[#181A1E] overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Animated Scroll Heading with Human Verification Seal Accent */}
         <ScrollHeading

@@ -76,7 +76,7 @@ export const AdminCommandPreview: React.FC = () => {
       : activeIncidents.filter((i) => i.level === selectedRiskFilter);
 
   return (
-    <section className="relative py-20 sm:py-28 bg-[#181A1E] border-t border-[#2A2D35] text-[#FAF9F6] overflow-hidden">
+    <section className="relative py-20 sm:py-28 pattern-radar-rings border-t border-[#2A2D35] text-[#FAF9F6] overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="max-w-3xl mb-10 space-y-3.5">
@@ -87,7 +87,7 @@ export const AdminCommandPreview: React.FC = () => {
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-[#9BBD00]"></span>
               </span>
               <span className="text-[11px] font-mono font-semibold tracking-wider uppercase">
-                ADMIN DISPATCH &amp; RESCUE INCIDENT CONSOLE
+                SECTION 09 · OPERATIONAL COMMAND COCKPIT &amp; RESCUE INCIDENT CONSOLE
               </span>
             </div>
             <span className="text-[10px] font-mono text-slate-400 border-l border-white/20 pl-2 hidden sm:inline">

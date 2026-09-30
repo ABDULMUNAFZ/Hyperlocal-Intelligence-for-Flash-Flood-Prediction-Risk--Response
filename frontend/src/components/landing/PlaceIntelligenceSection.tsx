@@ -154,7 +154,7 @@ export const PlaceIntelligenceSection: React.FC = () => {
   };
 
   return (
-    <section id="places" className="relative py-20 sm:py-28 bg-[#EBE8E0] border-t border-[#DDD9CE] text-[#23252A] overflow-hidden">
+    <section id="places" className="relative py-20 sm:py-28 pattern-topo-grid border-t border-[#DDD9CE] text-[#23252A] overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Animated Scroll Heading with Depth Gauge Accent */}
         <ScrollHeading

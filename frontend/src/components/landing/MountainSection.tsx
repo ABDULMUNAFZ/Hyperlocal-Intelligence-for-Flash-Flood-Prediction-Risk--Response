@@ -53,14 +53,11 @@ export const MountainSection: React.FC = () => {
   }, [slopeDeg, rainfallMmH, soilSaturation]);
 
   return (
-    <section id="mountain" className="relative py-20 sm:py-28 bg-white border-t border-[#DDD9CE] text-[#181A1E] overflow-hidden">
+    <section id="mountain" className="relative py-20 sm:py-28 pattern-topo-grid border-t border-[#DDD9CE] text-[#181A1E] overflow-hidden">
       {/* Real Mountain Hill Illustration Backdrop */}
       <div className="absolute inset-x-0 bottom-0 h-64 pointer-events-none opacity-20">
         <MountainHillsIllustration variant="section-backdrop" showContourGrid={false} className="h-full" />
       </div>
-
-      {/* Light Topographic Contour Background */}
-      <div className="absolute inset-0 light-contour-lines pointer-events-none opacity-30" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Animated Scroll Heading with Topographic Elevation Accent */}
@@ -74,13 +71,16 @@ export const MountainSection: React.FC = () => {
 
         {/* Dynamic Mountain Cross-Section & Hydrology Diagram */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Visual Canvas Diagram (7 cols) - White Porcelain Card */}
-          <div className="lg:col-span-7 bg-white rounded-3xl border border-[#E6E4DE] p-6 shadow-sm relative overflow-hidden">
+          {/* Visual Canvas Diagram (7 cols) - Geological Strata Slate */}
+          <div className="lg:col-span-7 bg-white rounded-3xl border-2 border-[#181A1E]/15 p-6 shadow-xl relative overflow-hidden group hover:border-[#181A1E] transition-all">
+            {/* Topographic Altitude Scale Ruler on Top */}
             <div className="flex items-center justify-between pb-4 border-b border-[#EAE7DF] mb-6 text-xs font-mono">
-              <span className="text-[#141518] font-bold flex items-center gap-1.5">
-                <Mountain className="h-4 w-4 text-violet-700" />
-                WAYANAD ELEVATION PROFILE: CHEMBRA TO CHOORALMALA
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="h-2.5 w-2.5 rounded-full bg-violet-600"></span>
+                <span className="text-[#141518] font-black tracking-wider uppercase">
+                  SECTION 01 · TOPOGRAPHIC STRATA PROFILE: CHEMBRA PEAK (2,100M) → CHOORALMALA BASIN (780M)
+                </span>
+              </div>
               <DataHonestyBadge kind="OBSERVED" source="Copernicus DEM 30m" size="sm" />
             </div>
 
