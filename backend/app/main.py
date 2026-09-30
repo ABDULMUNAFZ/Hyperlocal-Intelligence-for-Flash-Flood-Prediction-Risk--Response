@@ -121,3 +121,23 @@ async def root():
         "description": "Flash Flood Prediction System for Hilly Regions",
         "docs": "/docs",
     }
+
+
+@app.get("/api/v1", tags=["Health"])
+@app.get("/api/v1/", include_in_schema=False)
+async def api_index():
+    """Index of the v1 API (the prefix itself has no resource of its own)."""
+    return {
+        "name": "FloodGuard API",
+        "version": "1.0.0",
+        "api": "v1",
+        "status": "ok",
+        "environment": settings.ENVIRONMENT,
+        "links": {
+            "health": "/api/v1/health",
+            "liveness": "/health",
+            "docs": "/docs",
+            "openapi": "/openapi.json",
+            "live_stream": "/api/v1/live/stream",
+        },
+    }
