@@ -166,8 +166,14 @@ export const WayanadMap = forwardRef<WayanadMapHandle, Props>(function WayanadMa
   useEffect(() => {
     if (!container.current || mapRef.current) return;
     const start = JOURNEY[0];
+    // Cap the drawing-buffer size on very large / high-DPI screens (e.g. 4K TVs): 3D terrain, hillshade and
+    // building extrusions are fill-rate bound, so > ~6 MP per frame costs smoothness without visible gain.
+    const cssPx = Math.max(1, container.current.clientWidth * container.current.clientHeight || window.innerWidth * window.innerHeight);
+    const dpr = window.devicePixelRatio || 1;
+    const pixelRatio = cssPx * dpr * dpr > 6.2e6 ? Math.max(1, Math.sqrt(6.2e6 / cssPx)) : dpr;
     const map = new maplibregl.Map({
       container: container.current,
+      pixelRatio,
       style: buildStyle(propsRef.current.theme),
       center: start.center,
       zoom: start.zoom,
@@ -210,22 +216,31 @@ export const WayanadMap = forwardRef<WayanadMapHandle, Props>(function WayanadMa
       if (!Number.isFinite(c.lng) || !Number.isFinite(c.lat)) return;
       propsRef.current.onMove({ center: [c.lng, c.lat], zoom: map.getZoom(), pitch: map.getPitch(), bearing: map.getBearing() });
     };
+    // Telemetry drives React state (top bar, compass, camera mode): ~5 updates/s while moving is plenty,
+    // plus an exact value when the movement ends — re-rendering the page every frame caused stutter.
     map.on('moveend', emitMove);
-    let moveRaf = 0;
+    let lastMoveEmit = 0;
+    let moveTimer = 0;
     map.on('move', () => {
-      if (moveRaf) return;
-      moveRaf = requestAnimationFrame(() => { moveRaf = 0; emitMove(); });
+      const now = performance.now();
+      if (now - lastMoveEmit >= 200) { lastMoveEmit = now; emitMove(); return; }
+      if (!moveTimer) moveTimer = window.setTimeout(() => { moveTimer = 0; lastMoveEmit = performance.now(); emitMove(); }, 200);
     });
 
-    let hoverRaf = 0;
+    // Hover inspection (feature query + 5 terrain samples) at most ~10x/s, and not while the camera moves.
+    let hoverTimer = 0;
+    let lastHoverAt = 0;
     let lastHover: MapMouseEvent | null = null;
     map.on('mousemove', (e) => {
       lastHover = e;
-      if (hoverRaf) return;
-      hoverRaf = requestAnimationFrame(() => {
-        hoverRaf = 0;
+      if (hoverTimer) return;
+      const wait = Math.max(0, 100 - (performance.now() - lastHoverAt));
+      hoverTimer = window.setTimeout(() => {
+        hoverTimer = 0;
+        if (map.isMoving()) return;
+        lastHoverAt = performance.now();
         if (lastHover) handleHover(map, lastHover);
-      });
+      }, wait);
     });
     map.on('mouseout', () => propsRef.current.onHover(null));
     map.on('click', (e) => handleClick(map, e));
@@ -253,6 +268,8 @@ export const WayanadMap = forwardRef<WayanadMapHandle, Props>(function WayanadMa
     window.addEventListener('resize', handleWinResize);
 
     return () => {
+      window.clearTimeout(moveTimer);
+      window.clearTimeout(hoverTimer);
       resizeObserver.disconnect();
       window.removeEventListener('resize', handleWinResize);
       if (animRef.current) cancelAnimationFrame(animRef.current);
@@ -880,7 +897,7 @@ export const WayanadMap = forwardRef<WayanadMapHandle, Props>(function WayanadMa
     let last = 0;
     const tick = (ts: number) => {
       animRef.current = requestAnimationFrame(tick);
-      if (ts - last < 50) return;
+      if (ts - last < 66 || map.isMoving() || document.hidden) return; // ~15 fps, paused during camera moves
       last = ts;
       const t = (ts / 2600) % 1;
       const pulses = [t, (t + 1 / 3) % 1, (t + 2 / 3) % 1].sort((a, b) => a - b);

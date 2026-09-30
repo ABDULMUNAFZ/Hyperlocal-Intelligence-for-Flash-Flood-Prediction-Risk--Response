@@ -47,12 +47,20 @@ export function RainOverlay({ map, cells, dark }: { map: MLMap | null; cells: Ra
     resize();
     window.addEventListener('resize', resize);
 
-    const frame = () => {
+    let lastFrame = 0;
+    let cleared = false;
+    const frame = (ts: number = performance.now()) => {
       raf = requestAnimationFrame(frame);
+      if (ts - lastFrame < 33 || document.hidden) return; // 30 fps is smooth for rain streaks
+      lastFrame = ts;
       const w = cv.clientWidth, h = cv.clientHeight;
-      ctx.clearRect(0, 0, w, h);
       const cs = cellsRef.current;
-      if (!cs.length) return;
+      if (!cs.length) {
+        if (!cleared) { ctx.clearRect(0, 0, w, h); cleared = true; } // nothing to draw: skip per-frame clears
+        return;
+      }
+      cleared = false;
+      ctx.clearRect(0, 0, w, h);
       const pitch = map.getPitch();
       const stretch = 1 + pitch / 45; // streaks lengthen as the camera tilts
       const slant = 0.12;

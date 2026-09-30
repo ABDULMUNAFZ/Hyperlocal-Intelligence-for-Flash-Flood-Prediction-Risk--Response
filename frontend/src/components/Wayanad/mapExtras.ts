@@ -251,9 +251,12 @@ export function startWaterFlow(map: MLMap): () => void {
   let step = 0;
   let last = 0;
   let raf = 0;
+  // Every dash change invalidates the terrain render-to-texture cache (the whole draped surface is
+  // re-rendered), so: step ~7x/s, never while the camera moves, and only where the layer is drawn (z >= 10).
   const tick = (ts: number) => {
     raf = requestAnimationFrame(tick);
-    if (ts - last < 90) return;
+    if (ts - last < 140) return;
+    if (map.isMoving() || map.getZoom() < 10 || document.hidden) return;
     last = ts;
     step = (step + 1) % DASH_SEQ.length;
     if (map.getLayer('waterway-flow') && map.getLayoutProperty('waterway-flow', 'visibility') !== 'none') {
