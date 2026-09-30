@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { ArrowLeftRight, Eye, ShieldAlert, Sparkles, Droplets } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeftRight, Eye, ShieldAlert, Sparkles, Droplets, Compass } from 'lucide-react';
 
 interface FloodComparisonViewerProps {
   className?: string;
@@ -8,6 +9,7 @@ interface FloodComparisonViewerProps {
 export const FloodComparisonViewer: React.FC<FloodComparisonViewerProps> = ({
   className = '',
 }) => {
+  const navigate = useNavigate();
   const [splitPos, setSplitPos] = useState<number>(50); // percentage 0 - 100
   const [isHovering, setIsHovering] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -37,16 +39,25 @@ export const FloodComparisonViewer: React.FC<FloodComparisonViewerProps> = ({
     setSplitPos(50); // gently glide back to center partition on mouse exit
   };
 
+  // Clicking anywhere on the image navigates directly to the 3D Map
+  const handleClick = () => {
+    navigate('/app/map');
+  };
+
   return (
     <div
       ref={containerRef}
+      onClick={handleClick}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onTouchMove={handleTouchMove}
       onTouchStart={() => setIsHovering(true)}
       onTouchEnd={handleMouseLeave}
-      className={`relative w-full h-full overflow-hidden select-none cursor-ew-resize ${className}`}
+      role="button"
+      tabIndex={0}
+      title="Click image to enter 3D Map (Hover to compare Before & Flooded)"
+      className={`relative w-full h-full overflow-hidden select-none cursor-pointer group ${className}`}
     >
       {/* LAYER 1: AFTER FLOOD / INUNDATION MAP (Hero 2 - Full Layer) */}
       <div className="absolute inset-0 w-full h-full">
@@ -123,9 +134,12 @@ export const FloodComparisonViewer: React.FC<FloodComparisonViewerProps> = ({
 
       {/* Bottom Floating Hint Strip */}
       <div className="absolute bottom-3 inset-x-0 z-20 flex items-center justify-center pointer-events-none">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-black/70 backdrop-blur-md border border-white/15 text-white/90 text-[10px] font-mono shadow-md">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-black/75 backdrop-blur-md border border-white/20 text-white text-[10px] font-mono shadow-md">
           <ArrowLeftRight className="h-3 w-3 text-[#D4F826]" />
-          <span>Hover left to see flooded map · Hover right to see before flood</span>
+          <span>Hover to compare</span>
+          <span className="text-white/40">|</span>
+          <Compass className="h-3 w-3 text-[#D4F826] animate-pulse" />
+          <span className="text-[#D4F826] font-bold">Click image to enter 3D Map</span>
         </div>
       </div>
     </div>

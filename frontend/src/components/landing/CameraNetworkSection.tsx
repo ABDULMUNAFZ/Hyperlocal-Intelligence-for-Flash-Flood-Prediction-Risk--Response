@@ -129,7 +129,7 @@ export const CameraNetworkSection: React.FC = () => {
         <div className="w-full h-1 bg-[#D4F826] shadow-[0_0_8px_#D4F826] animate-scanline-drop" />
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative max-w-7xl 2xl:max-w-[1680px] 3xl:max-w-[1980px] 4xl:max-w-[2400px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Animated Scroll Heading with Optical Viewfinder Crosshair Accent */}
         <ScrollHeading
           theme="dark"

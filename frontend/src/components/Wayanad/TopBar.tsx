@@ -139,8 +139,19 @@ export function TopBar(p: Props) {
             <div className="text-[13px] font-extrabold tracking-[0.22em] text-[#141518] dark:text-white flex items-center gap-1.5">
               <span>FLOODGUARD</span>
               <span className="px-1.5 py-0.2 rounded-full bg-[#181A1E] text-[#D4F826] text-[8px] font-mono font-bold">3D</span>
+              <span className="px-1.5 py-0.2 rounded-full bg-[#D4F826]/20 text-[#181A1E] dark:text-[#D4F826] text-[7.5px] font-mono font-bold border border-[#D4F826]/30 hidden xl:inline">SIH 2026 · PS 26192</span>
             </div>
-            <div className="text-[9.5px] font-semibold tracking-[0.2em] text-[#6A6D75] dark:text-slate-400">WAYANAD SITUATIONAL AWARENESS</div>
+            <div className="text-[9.5px] font-semibold tracking-[0.16em] text-[#6A6D75] dark:text-slate-400 flex items-center gap-1.5">
+              <span>WAYANAD SITUATIONAL AWARENESS</span>
+              <span className="hidden 2xl:inline text-[#9BBD00] dark:text-[#D4F826] font-mono text-[8.5px]">· Team Tech Mavericks</span>
+            </div>
+          </Link>
+          <Link
+            to="/"
+            className="hidden md:inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#F3F1EA] hover:bg-[#EAE7DF] dark:bg-white/10 dark:hover:bg-white/15 text-[#181A1E] dark:text-white text-[10.5px] font-mono font-medium border border-[#DDD9CE] dark:border-white/10 transition-all shrink-0 ml-1"
+            title="Return to FloodGuard Landing Page"
+          >
+            <span>← Landing</span>
           </Link>
         </div>
 

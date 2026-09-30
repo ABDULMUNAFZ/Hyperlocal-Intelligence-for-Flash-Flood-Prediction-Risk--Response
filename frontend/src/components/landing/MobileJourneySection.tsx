@@ -131,7 +131,7 @@ export const MobileJourneySection: React.FC = () => {
 
   return (
     <section id="mobile-journey" className="relative py-20 sm:py-28 pattern-mobile-pathway border-t border-[#DDD9CE] text-[#181A1E] overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl 2xl:max-w-[1680px] 3xl:max-w-[1980px] 4xl:max-w-[2400px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header (Authentic Clinical Capsule Style) */}
         <div className="max-w-3xl mb-10 space-y-3.5">
           <div className="flex items-center gap-2">

@@ -39,7 +39,7 @@ export default function LandingPage() {
       <HeroSection />
 
       {/* Signature Environmental Intelligence Scroll Reveal Manifesto */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto text-center border-y border-[#DDD9CE] bg-white/80 backdrop-blur-sm rounded-3xl my-8 shadow-xs">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-5xl 2xl:max-w-6xl 3xl:max-w-7xl mx-auto text-center border-y border-[#DDD9CE] bg-white/80 backdrop-blur-sm rounded-3xl my-8 shadow-xs">
         <div className="inline-block px-3 py-1 rounded-full bg-[#181A1E] text-[#D4F826] text-xs font-mono font-bold tracking-widest uppercase mb-4">
           ENVIRONMENTAL INTELLIGENCE PRINCIPLE
         </div>

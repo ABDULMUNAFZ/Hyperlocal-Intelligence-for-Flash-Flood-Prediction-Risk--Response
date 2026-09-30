@@ -86,7 +86,7 @@ export const SimulationSection: React.FC = () => {
 
   return (
     <section id="simulation" className="relative py-20 sm:py-28 pattern-fluid-chamber border-t border-[#262830] text-[#FAF9F6] overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl 2xl:max-w-[1680px] 3xl:max-w-[1980px] 4xl:max-w-[2400px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Animated Scroll Heading with Scenario Simulation Accent */}
         <ScrollHeading
           theme="dark"

@@ -59,7 +59,7 @@ export const MountainSection: React.FC = () => {
         <MountainHillsIllustration variant="section-backdrop" showContourGrid={false} className="h-full" />
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative max-w-7xl 2xl:max-w-[1680px] 3xl:max-w-[1980px] 4xl:max-w-[2400px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Animated Scroll Heading with Topographic Elevation Accent */}
         <ScrollHeading
           badge="TOPOGRAPHIC HYDROLOGY"

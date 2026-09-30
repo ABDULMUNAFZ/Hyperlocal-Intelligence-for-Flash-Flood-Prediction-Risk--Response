@@ -236,7 +236,25 @@ export const WayanadMap = forwardRef<WayanadMapHandle, Props>(function WayanadMa
       }
     });
 
+    // Auto-resize observer to dynamically adapt to 55" TVs, 4K displays, ultra-wide monitors, and fullscreen transitions
+    const resizeObserver = new ResizeObserver(() => {
+      if (readyRef.current && mapRef.current) {
+        map.resize();
+      }
+    });
+    if (container.current) {
+      resizeObserver.observe(container.current);
+    }
+    const handleWinResize = () => {
+      if (readyRef.current && mapRef.current) {
+        map.resize();
+      }
+    };
+    window.addEventListener('resize', handleWinResize);
+
     return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', handleWinResize);
       if (animRef.current) cancelAnimationFrame(animRef.current);
       readyRef.current = false;
       setReady(false);

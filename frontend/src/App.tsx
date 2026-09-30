@@ -3,11 +3,12 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Layout } from './components/Layout';
-import WayanadCommandCenter from './pages/WayanadCommandCenter';
-import { CommandCenterErrorBoundary } from './components/Wayanad/ErrorBoundary';
+import LandingPage from './pages/LandingPage';
 import FloodGuardLoader from './components/FloodGuardLoader';
-// Lazy load pages for optimal bundle splitting
-const LandingPage = lazy(() => import('./pages/LandingPage'));
+import { CommandCenterErrorBoundary } from './components/Wayanad/ErrorBoundary';
+
+// Lazy load heavy operational pages for optimal initial bundle splitting
+const WayanadCommandCenter = lazy(() => import('./pages/WayanadCommandCenter'));
 const ProductionRoadmap = lazy(() => import('./pages/ProductionRoadmap'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
 const CommandCenter = lazy(() => import('./pages/CommandCenter'));
@@ -44,8 +45,10 @@ const App: React.FC = () => {
         <BrowserRouter>
           <Suspense fallback={<FloodGuardLoader />}>
           <Routes>
-            {/* 1. Master Premium Landing Page */}
+            {/* 1. Master Premium Landing Page (Homescreen) */}
             <Route path="/" element={<LandingPage />} />
+            <Route path="/home" element={<LandingPage />} />
+            <Route path="/landing" element={<LandingPage />} />
 
             {/* 2. Operational Wayanad 3D Command Center */}
             <Route path="/app" element={<CommandCenterErrorBoundary><WayanadCommandCenter /></CommandCenterErrorBoundary>} />

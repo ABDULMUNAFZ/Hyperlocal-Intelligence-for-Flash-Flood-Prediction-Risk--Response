@@ -38,16 +38,36 @@ export const HeroSection: React.FC = () => {
       {/* Background Topographic Texture */}
       <div className="absolute inset-0 pointer-events-none light-contour-lines opacity-20 z-0" />
 
-      {/* Main Container */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      {/* Main Container - Expansive across Ultra-wide and 55" TV Screens */}
+      <div className="relative z-10 max-w-7xl 2xl:max-w-[1680px] 3xl:max-w-[1980px] 4xl:max-w-[2400px] mx-auto px-4 sm:px-6 lg:px-8 w-full">
         {/* DESKTOP HERO ARCHITECTURE (>= 1024px) - EXACT REFERENCE MATCH */}
-        <div className="hidden lg:block relative w-full h-[680px]">
+        <div className="hidden lg:block relative w-full h-[690px] 2xl:h-[750px]">
           {/* 1. OUTSIDE TOP-LEFT NOTCH (Sitting in the upper-left cutout) */}
-          <div className="absolute top-0 left-2 z-30 max-w-md select-none">
+          <div className="absolute top-0 left-2 z-30 max-w-xl select-none">
+            {/* Official Smart India Hackathon 2026 Accreditation Tag */}
+            <div className="space-y-1.5 mb-3">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#181A1E] text-white border border-[#2B2E37] shadow-md text-[11px] font-mono">
+                <span className="h-2 w-2 rounded-full bg-[#D4F826] animate-pulse" />
+                <span className="text-[#D4F826] font-bold tracking-wider">SMART INDIA HACKATHON 2026</span>
+                <span className="text-white/40">|</span>
+                <span className="text-white font-semibold">PS ID: 26192</span>
+              </div>
+              <div className="px-3.5 py-1.5 rounded-2xl bg-white/95 border border-[#DDD9CE] shadow-xs text-[10.5px] font-mono text-[#33363F] max-w-lg leading-snug">
+                <div className="font-bold text-[#181A1E] truncate">
+                  PS: <span className="font-medium text-[#45474E]">Flash Flood Prediction System for Hilly Regions using Multi-Source Data Theme</span>
+                </div>
+                <div className="text-[10px] text-[#6A6D75] mt-0.5 flex items-center gap-2">
+                  <span>Done by: <strong className="text-[#181A1E] font-bold">Team Tech Mavericks</strong></span>
+                  <span>•</span>
+                  <span>Smart India Hackathon 2026</span>
+                </div>
+              </div>
+            </div>
+
             <div className="font-mono text-sm tracking-widest text-[#45474E] uppercase flex items-center gap-1.5 font-medium">
               <span className="text-[#181A1E] font-bold">: //</span> BRINGING DATA TO REAL LIFE
             </div>
-            <h1 className="font-display font-extrabold text-5xl lg:text-6xl tracking-tight text-[#181A1E] uppercase leading-[0.94] mt-2">
+            <h1 className="font-display font-extrabold text-5xl lg:text-6xl 2xl:text-7xl tracking-tight text-[#181A1E] uppercase leading-[0.94] mt-1.5">
               AI-DRIVEN
             </h1>
             <div className="text-xs font-mono text-[#6A6D75] tracking-wider mt-1.5 uppercase flex items-center gap-2">
@@ -124,27 +144,30 @@ export const HeroSection: React.FC = () => {
             </div>
           </div>
 
-          {/* 3. OUTSIDE BOTTOM-RIGHT NOTCH (Sitting cleanly in the lower-right cutout with zero frame collision) */}
-          <div className="absolute bottom-4 right-8 z-30 text-right select-none flex flex-col items-end">
-            <div className="font-display font-black text-2xl lg:text-[26px] tracking-tight text-[#181A1E] uppercase leading-tight">
-              SEE THE FLOOD
-            </div>
-            <div className="font-display font-extrabold text-base lg:text-[18px] tracking-tight text-[#181A1E] uppercase leading-tight mt-0.5 flex items-center justify-end gap-1.5">
-              <span>BEFORE IT REACHES THE TOWN</span>
-              <span className="text-[#181A1E] text-base lg:text-lg animate-spin-slow">✹</span>
-            </div>
-
-            {/* SINGLE PROMINENT BUTTON (Compact, Sleek, Safe Distance From Frame) */}
-            <div className="mt-2.5">
+          {/* 3. OUTSIDE BOTTOM-RIGHT NOTCH: BUTTON MOVED UP (BIGGER & LENGTHIER), HEADING BROUGHT DOWN */}
+          <div className="absolute bottom-3 right-6 lg:right-8 z-30 text-right select-none flex flex-col items-end gap-2.5">
+            {/* BIGGER & LENGTHIER BUTTON MOVED UP */}
+            <div>
               <Link
                 to="/app/map"
-                className="group inline-flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-[#181A1E] hover:bg-[#2A2D35] text-white font-display font-bold text-xs tracking-wider shadow-lg shadow-black/15 transition-all transform hover:-translate-y-0.5 border border-[#33363F]"
+                className="group inline-flex items-center justify-center gap-3.5 px-9 lg:px-12 py-3.5 lg:py-4 rounded-full bg-[#181A1E] hover:bg-[#282B34] text-white font-display font-black text-sm lg:text-base tracking-widest shadow-2xl shadow-black/25 transition-all transform hover:-translate-y-0.5 border border-[#33363F] hover:border-[#D4F826]/50 min-w-[280px] lg:min-w-[340px]"
               >
-                <span className="flex h-2 w-2 rounded-full bg-[#D4F826] shadow-[0_0_8px_#D4F826]"></span>
-                <span>VIEW 3D MAP</span>
-                <span className="text-[#A0A4B0] text-[10px] font-mono font-normal">| STEP IN</span>
-                <ArrowRight className="h-4 w-4 text-[#D4F826] group-hover:translate-x-1 transition-transform" />
+                <span className="flex h-2.5 w-2.5 rounded-full bg-[#D4F826] shadow-[0_0_10px_#D4F826] animate-pulse"></span>
+                <span className="tracking-widest uppercase">VIEW 3D MAP</span>
+                <span className="text-[#A0A4B0] text-xs font-mono font-normal">| STEP IN</span>
+                <ArrowRight className="h-4.5 w-4.5 text-[#D4F826] group-hover:translate-x-1.5 transition-transform" />
               </Link>
+            </div>
+
+            {/* HEADING BROUGHT DOWN BELOW BUTTON */}
+            <div className="text-right">
+              <div className="font-display font-black text-xl lg:text-[22px] tracking-tight text-[#181A1E] uppercase leading-tight">
+                SEE THE FLOOD
+              </div>
+              <div className="font-display font-extrabold text-sm lg:text-[16px] tracking-tight text-[#45474E] uppercase leading-tight mt-0.5 flex items-center justify-end gap-1.5">
+                <span>BEFORE IT REACHES TO TOWN</span>
+                <span className="text-[#181A1E] text-sm lg:text-base animate-spin-slow">✹</span>
+              </div>
             </div>
           </div>
         </div>
@@ -153,6 +176,20 @@ export const HeroSection: React.FC = () => {
         <div className="block lg:hidden space-y-6">
           {/* Mobile Top Heading */}
           <div className="text-center sm:text-left space-y-2">
+            {/* Official Smart India Hackathon 2026 Accreditation Tag */}
+            <div className="flex flex-col gap-1.5 items-center sm:items-start mb-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#181A1E] text-white border border-[#2B2E37] shadow-md text-[10px] font-mono">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#D4F826] animate-pulse" />
+                <span className="text-[#D4F826] font-bold">SMART INDIA HACKATHON 2026</span>
+                <span className="text-white/40">|</span>
+                <span>PS ID: 26192</span>
+              </div>
+              <div className="px-3 py-1 rounded-xl bg-white/95 border border-[#DDD9CE] shadow-2xs text-[10px] font-mono text-[#33363F] text-center sm:text-left max-w-sm">
+                <div>Flash Flood Prediction System for Hilly Regions using Multi-Source Data</div>
+                <div className="text-[#6A6D75] mt-0.5">Team Tech Mavericks · Smart India Hackathon 2026</div>
+              </div>
+            </div>
+
             <div className="font-mono text-xs tracking-widest text-[#45474E] uppercase flex items-center justify-center sm:justify-start gap-1.5 font-medium">
               <span className="text-[#181A1E] font-bold">: //</span> BRINGING DATA TO REAL LIFE
             </div>
@@ -189,51 +226,51 @@ export const HeroSection: React.FC = () => {
             </div>
           </div>
 
-          {/* Mobile Bottom Heading & Single Prominent Button */}
+          {/* Mobile Bottom: Button Moved Up (Bigger & Lengthier), Heading Brought Down */}
           <div className="text-center sm:text-right space-y-3 pt-2">
-            <div className="font-display font-black text-2xl sm:text-3xl tracking-tight text-[#181A1E] uppercase leading-tight">
-              SEE THE FLOOD <br />
-              <span className="flex items-center justify-center sm:justify-end gap-1.5">
-                BEFORE IT REACHES THE TOWN <span className="text-[#181A1E] text-lg sm:text-xl">✹</span>
-              </span>
-            </div>
-
+            {/* BIGGER & LENGTHIER BUTTON (MOVED UP) */}
             <div>
               <Link
                 to="/app/map"
-                className="group inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-[#181A1E] hover:bg-[#2A2D35] text-white font-display font-bold text-xs tracking-wider shadow-lg shadow-black/20 transition-all border border-[#33363F]"
+                className="group inline-flex items-center justify-center gap-3.5 w-full sm:w-auto px-10 py-4 rounded-full bg-[#181A1E] hover:bg-[#2A2D35] text-white font-display font-black text-sm tracking-widest shadow-xl shadow-black/20 transition-all border border-[#33363F] min-w-[280px]"
               >
-                <span className="flex h-2 w-2 rounded-full bg-[#D4F826] shadow-[0_0_8px_#D4F826]"></span>
+                <span className="flex h-2.5 w-2.5 rounded-full bg-[#D4F826] shadow-[0_0_8px_#D4F826] animate-pulse"></span>
                 <span>VIEW 3D MAP</span>
-                <span className="text-[#A0A4B0] text-[10px] font-mono font-normal">| STEP IN</span>
-                <ArrowRight className="h-4 w-4 text-[#D4F826] group-hover:translate-x-1 transition-transform" />
+                <span className="text-[#A0A4B0] text-xs font-mono font-normal">| STEP IN</span>
+                <ArrowRight className="h-4.5 w-4.5 text-[#D4F826] group-hover:translate-x-1 transition-transform" />
               </Link>
+            </div>
+
+            {/* HEADING (BROUGHT DOWN BELOW BUTTON) */}
+            <div className="font-display font-black text-2xl sm:text-3xl tracking-tight text-[#181A1E] uppercase leading-tight pt-1">
+              SEE THE FLOOD <br />
+              <span className="flex items-center justify-center sm:justify-end gap-1.5">
+                BEFORE IT REACHES TO TOWN <span className="text-[#181A1E] text-lg sm:text-xl">✹</span>
+              </span>
             </div>
           </div>
         </div>
 
-        {/* District Running Ticker Bar Below Hero */}
-        <div className="relative z-20 w-full mt-10 py-3 bg-[#181A1E] text-[#FAF9F6] rounded-2xl border border-[#2A2D35] shadow-xs overflow-hidden">
+        {/* District Running Ticker Bar Below Hero (Includes SIH 2026 Credits) */}
+        <div className="relative z-20 w-full mt-10 py-3.5 bg-[#181A1E] text-[#FAF9F6] rounded-2xl border border-[#2A2D35] shadow-xs overflow-hidden">
           <div className="marquee-track">
             <div className="marquee-content font-mono text-xs sm:text-sm tracking-wider uppercase">
-              <span className="text-[#D4F826]">◆ HYPERLOCAL FLASH-FLOOD INTELLIGENCE FOR WAYANAD</span>
+              <span className="text-[#D4F826] font-bold">★ SMART INDIA HACKATHON 2026 · PROBLEM STATEMENT ID: 26192 · PROBLEM STATEMENT TITLE: FLASH FLOOD PREDICTION SYSTEM FOR HILLY REGIONS USING MULTI-SOURCE DATA THEME · DONE BY TEAM TECH MAVERICKS</span>
+              <span>◆ HYPERLOCAL FLASH-FLOOD INTELLIGENCE FOR WAYANAD</span>
               <span>· 461 GAUGED WATERSHEDS</span>
-              <span>· 30M COPERNICUS DIGITAL ELEVATION MODEL</span>
-              <span>· SATELLITE RADAR REFLECTIVITY</span>
-              <span className="text-[#D4F826]">· EARLY RUNOFF LEAD TIME &lt; 45 MIN</span>
+              <span>· 30M COPERNICUS DEM</span>
+              <span>· DOPPLER RADAR REFLECTIVITY</span>
+              <span className="text-[#D4F826]">· LEAD TIME &lt; 45 MIN</span>
               <span>· AI DETECTS · HUMANS DECIDE</span>
-              <span>· 100% CERTIFIED DISASTER MANAGER TRIAGE</span>
-              <span>· CITIZEN GEOLOCATION SOS DISPATCH</span>
             </div>
             <div className="marquee-content font-mono text-xs sm:text-sm tracking-wider uppercase" aria-hidden="true">
-              <span className="text-[#D4F826]">◆ HYPERLOCAL FLASH-FLOOD INTELLIGENCE FOR WAYANAD</span>
+              <span className="text-[#D4F826] font-bold">★ SMART INDIA HACKATHON 2026 · PROBLEM STATEMENT ID: 26192 · PROBLEM STATEMENT TITLE: FLASH FLOOD PREDICTION SYSTEM FOR HILLY REGIONS USING MULTI-SOURCE DATA THEME · DONE BY TEAM TECH MAVERICKS</span>
+              <span>◆ HYPERLOCAL FLASH-FLOOD INTELLIGENCE FOR WAYANAD</span>
               <span>· 461 GAUGED WATERSHEDS</span>
-              <span>· 30M COPERNICUS DIGITAL ELEVATION MODEL</span>
-              <span>· SATELLITE RADAR REFLECTIVITY</span>
-              <span className="text-[#D4F826]">· EARLY RUNOFF LEAD TIME &lt; 45 MIN</span>
+              <span>· 30M COPERNICUS DEM</span>
+              <span>· DOPPLER RADAR REFLECTIVITY</span>
+              <span className="text-[#D4F826]">· LEAD TIME &lt; 45 MIN</span>
               <span>· AI DETECTS · HUMANS DECIDE</span>
-              <span>· 100% CERTIFIED DISASTER MANAGER TRIAGE</span>
-              <span>· CITIZEN GEOLOCATION SOS DISPATCH</span>
             </div>
           </div>
         </div>

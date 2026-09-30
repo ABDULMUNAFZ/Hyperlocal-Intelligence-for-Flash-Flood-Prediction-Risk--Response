@@ -6,7 +6,7 @@ import FloodGuardLogo from '../common/FloodGuardLogo';
 export const LandingFooter: React.FC = () => {
   return (
     <footer className="relative bg-[#141518] text-[#F6F5F2] pt-16 pb-12 overflow-hidden border-t border-[#26282E]">
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+      <div className="relative max-w-7xl 2xl:max-w-[1680px] 3xl:max-w-[1980px] 4xl:max-w-[2400px] mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         {/* Big Final CTA Banner */}
         <div className="p-8 sm:p-14 rounded-3xl bg-[#EBE8E0] text-[#141518] border border-[#DDD9CE] text-center space-y-6 shadow-xl relative overflow-hidden">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#181A1E] text-white font-mono text-xs font-bold uppercase tracking-wider">
@@ -53,6 +53,57 @@ export const LandingFooter: React.FC = () => {
               <span>STAR ON GITHUB</span>
               <span className="text-white">★</span>
             </a>
+          </div>
+        </div>
+
+        {/* Official Smart India Hackathon 2026 National Project Accreditation Card */}
+        <div className="p-6 sm:p-8 rounded-3xl bg-[#1B1D22] border-2 border-[#2E323D] relative overflow-hidden shadow-2xl">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-2.5 max-w-3xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#141518] border border-[#3A3E4B] text-[11px] font-mono text-[#D4F826]">
+                <span className="h-2 w-2 rounded-full bg-[#D4F826] animate-pulse"></span>
+                <span className="font-bold">SMART INDIA HACKATHON 2026</span>
+                <span className="text-white/40">|</span>
+                <span className="text-white font-semibold">PS ID: 26192</span>
+              </div>
+              <h3 className="font-display font-extrabold text-xl sm:text-2xl text-white tracking-tight">
+                Flash Flood Prediction System for Hilly Regions using Multi-Source Data Theme
+              </h3>
+              <p className="text-slate-400 text-xs sm:text-sm font-sans leading-relaxed">
+                National hackathon innovation engineered to predict and track catastrophic flash floods across steep mountain watersheds 
+                (Wayanad, Western Ghats) through integrated Copernicus 30m DEM, real-time radar precipitation, and ML slope failure physics.
+              </p>
+              <div className="flex flex-wrap items-center gap-4 text-xs font-mono pt-1 text-slate-300">
+                <div className="flex items-center gap-2">
+                  <span className="text-[#D4F826] font-bold">Done by:</span>
+                  <span className="text-white font-semibold">Team Tech Mavericks</span>
+                </div>
+                <span className="text-slate-600">•</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-slate-400">National Submission:</span>
+                  <span className="text-white font-semibold">Smart India Hackathon 2026</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="shrink-0 flex flex-col sm:flex-row md:flex-col gap-2.5">
+              <a
+                href="https://github.com/ABDULMUNAFZ/Hyperlocal-Intelligence-for-Flash-Flood-Prediction-Risk--Response"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-[#D4F826] hover:bg-[#bce014] text-[#181A1E] font-bold text-xs tracking-wider shadow-md transition-all hover:scale-105"
+              >
+                <Github className="h-4 w-4" />
+                <span>GITHUB REPO ★</span>
+              </a>
+              <Link
+                to="/app/map"
+                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-full bg-[#252830] hover:bg-[#323642] text-white border border-white/10 font-bold text-xs tracking-wider transition-all"
+              >
+                <Compass className="h-4 w-4 text-[#D4F826]" />
+                <span>EXPLORE 3D MAP</span>
+              </Link>
+            </div>
           </div>
         </div>
 
