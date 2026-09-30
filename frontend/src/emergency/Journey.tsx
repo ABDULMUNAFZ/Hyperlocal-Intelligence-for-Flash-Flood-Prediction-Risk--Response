@@ -112,7 +112,7 @@ export function Journey({ me, r, onUpdate, onRescue }: { me: MeDTO; r: RescueReq
       </div>
 
       <div className="relative h-[46vh] overflow-hidden rounded-2xl ring-1 ring-slate-300">
-        <div ref={box} className="absolute inset-0" />
+        <div ref={box} className="absolute inset-0" style={{ position: 'absolute', inset: 0 }} />{/* inline: MapLibre CSS sets position:relative */}
         {!routeOk && (
           <div className="absolute inset-x-2 top-2 rounded-xl bg-slate-900/90 px-3 py-2 text-center text-white">
             <div className="text-[13px] font-black tracking-wider">ROUTING DATA UNAVAILABLE</div>

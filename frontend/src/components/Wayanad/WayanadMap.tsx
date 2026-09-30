@@ -941,5 +941,8 @@ export const WayanadMap = forwardRef<WayanadMapHandle, Props>(function WayanadMa
     if (map) setVis(map, 'waterway-flow', props.layers.rivers || props.layers.streams);
   }, [props.layers.rivers, props.layers.streams, ready]);
 
-  return <div ref={container} className="absolute inset-0" />;
+  // Inline positioning on purpose: MapLibre's stylesheet sets `.maplibregl-map { position: relative }` on this
+  // element. When the page is lazy-loaded, that CSS chunk arrives after Tailwind and would override
+  // `absolute inset-0`, collapsing the map to 0 px height. Inline styles always win.
+  return <div ref={container} className="absolute inset-0" style={{ position: 'absolute', inset: 0 }} />;
 });
