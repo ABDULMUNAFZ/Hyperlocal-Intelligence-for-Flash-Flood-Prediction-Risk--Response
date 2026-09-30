@@ -275,18 +275,18 @@ flowchart LR
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
-│ [logo] FloodGuard   Mountain · Signals · Radar · AI Cameras · Roadmap  [CITIZEN SOS] [VIEW 3D MAP] │
+│ [logo] FloodGuard  Mountain·Signals·Radar·Cameras [CITIZEN SOS] [3D MAP] │
 ├──────────────────────────────────────────────────────────────────────────┤
-│  // BRINGING DATA TO REAL LIFE                                            │
-│  AI-DRIVEN                         ┌───────────────────────────────────┐  │
-│  flash-flood risk intelligence     │  BEFORE  │◄──drag──►│  FLOODED    │  │
-│                                    │  (hero1)            (hero2)       │  │
-│                                    │   risk signs · people exposed     │  │
-│                                    └───────────────────────────────────┘  │
-│                          [ ● VIEW 3D MAP | STEP IN → ]                     │
+│  // BRINGING DATA TO REAL LIFE                                           │
+│  AI-DRIVEN                         ┌───────────────────────────────────┐ │
+│  flash-flood risk intelligence     │  BEFORE  │◄──drag──►│  FLOODED    │ │
+│                                    │  (hero1)            (hero2)       │ │
+│                                    │   risk signs · people exposed     │ │
+│                                    └───────────────────────────────────┘ │
+│                          [ ● VIEW 3D MAP | STEP IN → ]                   │
 ├──────────────────────────────────────────────────────────────────────────┤
-│ 01 Mountain hydrology · 02 Signals · 03 Weather · 04 Cameras · 05 Human-in-the-loop │
-│ 06 Place intelligence · 07 Simulation · 08 Citizen app · 09 Command preview │
+│ 01 Mountain hydrology · 02 Signals · 03 Weather · 04 Cameras · 05 Human  │
+│ 06 Place intel · 07 Simulation · 08 Citizen app · 09 Command preview     │
 │ Footer: SIH 2026 · PS 26192 · Team Tech Mavericks                        │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
@@ -295,8 +295,8 @@ flowchart LR
 
 ```
 ┌──────────────────────────────────────────────────────────────────────────┐
-│ FLOODGUARD 3D │ search… │ LAYERS SIMULATION PANELS▾ │ RESCUE PEOPLE HELP DEMO │ clock │
-│ ● SYSTEM ONLINE ● LIVE CHANNEL │ rain now │ SACHET │ model status │ weather │ mode · centre │
+│ FLOODGUARD 3D │ search… │ LAYERS  SIMULATION  PANELS▾ │ RESCUE PEOPLE    │
+│ ● SYSTEM ONLINE ● LIVE │ rain now │ SACHET │ model │ weather │ mode      │
 ├───────────────┬──────────────────────────────────────────┬───────────────┤
 │ OPERATIONS &  │                                          │ CONTEXT PANEL │
 │ LAYERS        │          3D MAP (MapLibre + terrain)     │ location ·    │
@@ -308,8 +308,8 @@ flowchart LR
 │ • exaggeration│                                          │ SIMULATION /  │
 │               │                                          │ RESCUE PERSON │
 ├───────────────┴──────────────────────────────────────────┴───────────────┤
-│   CAMERA · REGIONAL · DISTRICT · TOWN · VILLAGE · MICRO-ZONE · BUILDING · SIMULATION │
-│   South India › Kerala › Wayanad › Kalpetta › Meppadi › … › Mundakkai valley          │
+│ CAMERA · REGIONAL · DISTRICT · TOWN · VILLAGE · MICRO-ZONE · BUILDING    │
+│ South India › Kerala › Wayanad › Meppadi › … › Mundakkai valley          │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
 
