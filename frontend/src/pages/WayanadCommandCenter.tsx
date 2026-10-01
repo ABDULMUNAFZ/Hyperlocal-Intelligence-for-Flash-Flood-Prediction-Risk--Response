@@ -1,7 +1,8 @@
 // FloodGuard — Wayanad 3D situational-awareness command center.
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { X, Target } from 'lucide-react';
-import { WayanadMap, type WayanadMapHandle, type HoverInfo, type MapTelemetry, type StaticData } from '../components/Wayanad/WayanadMap';
+import { WayanadMap, type WayanadMapHandle, type WayanadMapProps, type HoverInfo, type MapTelemetry, type StaticData } from '../components/Wayanad/WayanadMap';
+import { detectWebGL } from '../components/Wayanad/webgl';
 import { TopBar, type PanelId, type SearchItem } from '../components/Wayanad/TopBar';
 import { LayerPanel } from '../components/Wayanad/LayerPanel';
 import { ContextPanel, nearestFacilities } from '../components/Wayanad/ContextPanel';
@@ -43,6 +44,8 @@ const WEATHER_KEYS: LayerKey[] = ['rainPast', 'rainForecast', 'temperature', 'hu
 const DEMO_PARAMS: SimParams = { ...DEFAULT_PARAMS, kind: 'combined', scenario: 'Extreme monsoon burst', rainfall_mm: 300, duration_h: 12, amc: 'III' };
 const CHOORALMALA: LngLat = [76.1598711, 11.4992319]; // OSM place node
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+// 2D fallback for browsers without WebGL — only downloaded when needed.
+const LiteMap = React.lazy(() => import('../components/Wayanad/LiteMap'));
 
 async function loadJson<T>(url: string): Promise<T | null> {
   try { const r = await fetch(url); return r.ok ? await r.json() : null; } catch { return null; }
@@ -55,6 +58,8 @@ export default function WayanadCommandCenter() {
 
   const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('fg-theme') as Theme) || 'light');
   const [is3D, setIs3D] = useState(true);
+  // null → WebGL works (3D map); otherwise the reason it does not and the 2D map is used
+  const [liteReason, setLiteReason] = useState<string | null>(() => { const gl = detectWebGL(); return gl.ok ? null : gl.detail; });
   const [layers, setLayers] = useState<LayerState>(DEFAULT_LAYERS);
   const [exaggeration, setExaggeration] = useState(1.4);
   const [layersOpen, setLayersOpen] = useState(!isMobile);
@@ -620,20 +625,51 @@ export default function WayanadCommandCenter() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [openPanel]);
 
+  const mapProps: WayanadMapProps = {
+    theme,
+    layers,
+    exaggeration,
+    is3D,
+    data,
+    zone: zs.zone,
+    zoneTerrain: zs.terrain,
+    zoneBuildings: displayBuildings,
+    zoneOsm: zs.osm,
+    zoneRisk: zs.risk,
+    rainGrid: rainGrid?.available ? rainGrid.geojson : null,
+    districtLayers,
+    routes,
+    routeOrigin,
+    selected: selectedLL,
+    interaction,
+    radiusKm,
+    flowAnimation,
+    showImpact,
+    onSelect,
+    onHover: setHover,
+    onMove: setTele,
+    onZoneDrawn: (z) => setZone(z),
+    onReady: () => { setMapReady(true); setMapObj(mapRef.current?.getMap() ?? null); },
+    signs,
+    liveAlerts: em.alertsFC,
+    reports: em.reportsFC,
+    userLocation: em.location?.lngLat ?? null,
+    sim: simLayers,
+    rescue: rescue.rescueFC,
+    rescueRoute,
+    safeLocations: rescue.safeFC,
+  };
+
   return (
     <div className={`fixed inset-0 overflow-hidden ${theme === 'dark' ? 'bg-[#0b1117]' : 'bg-[#eceee6]'}`}>
-      <WayanadMap
-        ref={mapRef}
-        theme={theme} layers={layers} exaggeration={exaggeration} is3D={is3D} data={data}
-        zone={zs.zone} zoneTerrain={zs.terrain} zoneBuildings={displayBuildings} zoneOsm={zs.osm} zoneRisk={zs.risk}
-        rainGrid={rainGrid?.available ? rainGrid.geojson : null} districtLayers={districtLayers}
-        routes={routes} routeOrigin={routeOrigin} selected={selectedLL}
-        interaction={interaction} radiusKm={radiusKm} flowAnimation={flowAnimation} showImpact={showImpact}
-        onSelect={onSelect} onHover={setHover} onMove={setTele}
-        onZoneDrawn={(z) => setZone(z)} onReady={() => { setMapReady(true); setMapObj(mapRef.current?.getMap() ?? null); }}
-        signs={signs} liveAlerts={em.alertsFC} reports={em.reportsFC} userLocation={em.location?.lngLat ?? null} sim={simLayers}
-        rescue={rescue.rescueFC} rescueRoute={rescueRoute} safeLocations={rescue.safeFC}
-      />
+      {liteReason ? (
+        <React.Suspense fallback={null}>
+          <LiteMap ref={mapRef} {...mapProps} reason={liteReason} />
+        </React.Suspense>
+      ) : (
+        <WayanadMap ref={mapRef} {...mapProps}
+          onWebGLFailure={(detail) => { setMapReady(false); setMapObj(null); setLiteReason(detail || 'WebGL unavailable'); }} />
+      )}
 
       <HoverTooltip info={interaction === 'select' ? hover : null} />
 

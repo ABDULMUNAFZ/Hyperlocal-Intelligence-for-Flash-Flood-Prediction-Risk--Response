@@ -54,7 +54,7 @@ export interface StaticData {
   cameras: Camera[];
 }
 
-interface Props {
+export interface WayanadMapProps {
   theme: Theme;
   layers: LayerState;
   exaggeration: number;
@@ -87,7 +87,11 @@ interface Props {
   onMove: (t: MapTelemetry) => void;
   onZoneDrawn: (z: OperationalZone) => void;
   onReady: () => void;
+  /** WebGL could not start (or was lost for good); the host switches to the 2D map. */
+  onWebGLFailure?: (detail: string) => void;
 }
+
+type Props = WayanadMapProps;
 
 const EMPTY: FeatureCollection = { type: 'FeatureCollection', features: [] };
 
@@ -171,7 +175,9 @@ export const WayanadMap = forwardRef<WayanadMapHandle, Props>(function WayanadMa
     const cssPx = Math.max(1, container.current.clientWidth * container.current.clientHeight || window.innerWidth * window.innerHeight);
     const dpr = window.devicePixelRatio || 1;
     const pixelRatio = cssPx * dpr * dpr > 6.2e6 ? Math.max(1, Math.sqrt(6.2e6 / cssPx)) : dpr;
-    const map = new maplibregl.Map({
+    let map: MLMap;
+    try {
+      map = new maplibregl.Map({
       container: container.current,
       pixelRatio,
       style: buildStyle(propsRef.current.theme),
@@ -185,8 +191,23 @@ export const WayanadMap = forwardRef<WayanadMapHandle, Props>(function WayanadMa
       maxBounds: [[66, 3], [99, 38.5]], // India (DEMO alerts may target a test device anywhere in India)
       attributionControl: { compact: true },
       fadeDuration: 150,
-    });
+      });
+    } catch (err) {
+      // No WebGL on this device (hardware acceleration off, GPU blocklisted, remote desktop…).
+      console.warn('FloodGuard: 3D map unavailable, switching to 2D', err);
+      const detail = err instanceof Error ? err.message : String(err);
+      propsRef.current.onWebGLFailure?.(detail.replace(/^.*"statusMessage":"([^"]+)".*$/s, '$1'));
+      return;
+    }
     mapRef.current = map;
+
+    // If the GPU drops the WebGL context and the browser cannot restore it, fall back to the 2D map.
+    let lostTimer = 0;
+    map.on('webglcontextlost', () => {
+      window.clearTimeout(lostTimer);
+      lostTimer = window.setTimeout(() => propsRef.current.onWebGLFailure?.('WebGL context was lost and not restored'), 8000);
+    });
+    map.on('webglcontextrestored', () => window.clearTimeout(lostTimer));
     if (import.meta.env.DEV) (window as any).__fgMap = map; // dev-only handle for debugging / automated checks
 
     // Initialise overlays as soon as the style is parsed; tiles (incl. terrain) stream in afterwards.
@@ -270,6 +291,7 @@ export const WayanadMap = forwardRef<WayanadMapHandle, Props>(function WayanadMa
     return () => {
       window.clearTimeout(moveTimer);
       window.clearTimeout(hoverTimer);
+      window.clearTimeout(lostTimer);
       resizeObserver.disconnect();
       window.removeEventListener('resize', handleWinResize);
       if (animRef.current) cancelAnimationFrame(animRef.current);

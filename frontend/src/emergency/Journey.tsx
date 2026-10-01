@@ -2,7 +2,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import maplibregl, { type GeoJSONSource, type Map as MLMap } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import type * as Leaflet from 'leaflet';
 import { buildStyle } from '../components/Wayanad/mapStyle';
+import { detectWebGL } from '../components/Wayanad/webgl';
 import { emergencyApi, apiError, type MeDTO, type RescueRequestDTO } from './api';
 import { bearing, compass, distanceM, fmtDistance, getFix, watchFix, type DeviceFix, ago } from './device';
 import { BigButton, ErrorNote, InfoNote } from './ui';
@@ -14,6 +16,10 @@ const WALK_MPS = 1.2; // fallback walking speed when no routed duration exists (
 export function Journey({ me, r, onUpdate, onRescue }: { me: MeDTO; r: RescueRequestDTO; onUpdate: (r: RescueRequestDTO) => void; onRescue: () => void }) {
   const box = useRef<HTMLDivElement>(null);
   const map = useRef<MLMap | null>(null);
+  // 2D fallback (Leaflet, canvas) when this device has no WebGL
+  const [lite, setLite] = useState(() => !detectWebGL().ok);
+  const liteMap = useRef<{ map: Leaflet.Map; me: Leaflet.CircleMarker; acc: Leaflet.Circle } | null>(null);
+  const [liteReady, setLiteReady] = useState(false);
   const [fix, setFix] = useState<DeviceFix | null>(null);
   const [gpsErr, setGpsErr] = useState<string | null>(null);
   const [reachBusy, setReachBusy] = useState(false);
@@ -29,7 +35,38 @@ export function Journey({ me, r, onUpdate, onRescue }: { me: MeDTO; r: RescueReq
   useEffect(() => {
     if (!box.current) return;
     const start = r.journey.start ?? [r.location.longitude, r.location.latitude];
-    const m = new maplibregl.Map({ container: box.current, style: buildStyle('light'), center: start, zoom: 14, attributionControl: { compact: true } });
+    if (lite) {
+      let gone = false;
+      let lm: Leaflet.Map | null = null;
+      Promise.all([import('leaflet'), import('leaflet/dist/leaflet.css')]).then(([mod]) => {
+        if (gone || !box.current) return;
+        const L = mod.default;
+        lm = L.map(box.current, { zoomControl: true, preferCanvas: true });
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap contributors' }).addTo(lm);
+        const line: [number, number][] = routeOk ? route!.geometry!.coordinates.map((c) => [c[1], c[0]] as [number, number]) : [];
+        if (line.length) {
+          L.polyline(line, { color: '#fff', weight: 9 }).addTo(lm);
+          L.polyline(line, { color: '#1971c2', weight: 5.5 }).addTo(lm);
+        }
+        L.circleMarker([destLL[1], destLL[0]], { radius: 11, color: '#fff', weight: 3, fillColor: '#2f9e44', fillOpacity: 1 })
+          .bindTooltip(`SAFE: ${dest.name}`, { permanent: true, direction: 'top', offset: [0, -12] }).addTo(lm);
+        const acc = L.circle([start[1], start[0]], { radius: 0, stroke: false, fillColor: '#1c7ed6', fillOpacity: 0.15 }).addTo(lm);
+        const me = L.circleMarker([start[1], start[0]], { radius: 8, color: '#fff', weight: 3, fillColor: '#1c7ed6', fillOpacity: 0 }).addTo(lm);
+        lm.fitBounds(L.latLngBounds([[start[1], start[0]], [destLL[1], destLL[0]], ...line]), { padding: [40, 40], maxZoom: 17 });
+        lm.on('dragstart', () => setFollow(false));
+        liteMap.current = { map: lm, me, acc };
+        setLiteReady(true); // re-applies the latest GPS fix
+      });
+      return () => { gone = true; lm?.remove(); liteMap.current = null; setLiteReady(false); };
+    }
+    let m: MLMap;
+    try {
+      m = new maplibregl.Map({ container: box.current, style: buildStyle('light'), center: start, zoom: 14, attributionControl: { compact: true } });
+    } catch (err) {
+      console.warn('FloodGuard: WebGL map unavailable, using 2D map', err);
+      setLite(true);
+      return;
+    }
     map.current = m;
     m.on('load', () => {
       m.setTerrain(null as any);
@@ -50,7 +87,7 @@ export function Journey({ me, r, onUpdate, onRescue }: { me: MeDTO; r: RescueReq
     m.on('dragstart', () => setFollow(false));
     return () => { m.remove(); map.current = null; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [r.id, r.journey.started_at]);
+  }, [r.id, r.journey.started_at, lite]);
 
   // live device position while this screen is open (foreground only)
   useEffect(() => {
@@ -67,6 +104,12 @@ export function Journey({ me, r, onUpdate, onRescue }: { me: MeDTO; r: RescueReq
       src.setData({ type: 'Feature', properties: { px: Math.min(120, Math.max(8, fix.accuracy_m / mpp)) }, geometry: { type: 'Point', coordinates: [fix.longitude, fix.latitude] } });
       if (follow) m.easeTo({ center: [fix.longitude, fix.latitude], duration: 600 });
     }
+    const lm = liteMap.current;
+    if (lm) {
+      lm.me.setLatLng([fix.latitude, fix.longitude]).setStyle({ fillOpacity: 1 });
+      lm.acc.setLatLng([fix.latitude, fix.longitude]).setRadius(Math.min(fix.accuracy_m, 1000));
+      if (follow) lm.map.panTo([fix.latitude, fix.longitude]);
+    }
     // share the real position with responders (throttled)
     const now = Date.now();
     const ll: [number, number] = [fix.longitude, fix.latitude];
@@ -75,7 +118,7 @@ export function Journey({ me, r, onUpdate, onRescue }: { me: MeDTO; r: RescueReq
       lastPost.current = { t: now, ll };
       emergencyApi.location(fix).catch(() => { lastPost.current = null; });
     }
-  }, [fix, follow]);
+  }, [fix, follow, liteReady]);
 
   const remaining = fix ? distanceM([fix.longitude, fix.latitude], destLL) : null;
   const allowance = me.limits.arrival_radius_m + Math.min(fix?.accuracy_m ?? 0, 300);
