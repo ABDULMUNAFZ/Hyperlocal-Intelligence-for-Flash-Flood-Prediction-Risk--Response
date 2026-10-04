@@ -1,16 +1,13 @@
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
+import { gsap, MQ } from './story/gsap';
+import { Magnetic } from './story/Magnetic';
+import { ScrollHeading } from './ScrollHeading';
 import { Link } from 'react-router-dom';
 import {
-  ShieldAlert,
   ArrowRight,
-  Filter,
-  CheckCircle2,
-  Clock,
-  ExternalLink,
   Compass,
   Terminal,
 } from 'lucide-react';
-import { DataHonestyBadge } from './DataHonestyBadge';
 
 interface IncidentItem {
   id: string;
@@ -70,46 +67,44 @@ export const AdminCommandPreview: React.FC = () => {
   const [selectedRiskFilter, setSelectedRiskFilter] = useState<'ALL' | 'CRITICAL' | 'HIGH'>('ALL');
   const [activeIncidents] = useState<IncidentItem[]>(INCIDENTS);
 
+  const board = useRef<HTMLDivElement>(null);
+  // The dashboard rises from below tilted back in 3D and flattens as it reaches the middle of the screen.
+  useLayoutEffect(() => {
+    const el = board.current;
+    if (!el) return;
+    const ctx = gsap.context(() => {
+      const mm = gsap.matchMedia();
+      mm.add(MQ.desktop, () => {
+        gsap.fromTo(el, { rotateX: 28, y: 160, scale: 0.88, opacity: 0.2, transformPerspective: 1400, transformOrigin: '50% 100%' }, {
+          rotateX: 0, y: 0, scale: 1, opacity: 1, ease: 'none',
+          scrollTrigger: { trigger: el, start: 'top bottom', end: 'top 25%', scrub: 0.6 },
+        });
+      });
+      mm.add(MQ.mobile, () => {
+        gsap.from(el, { y: 40, opacity: 0, duration: 0.8, ease: 'power2.out', scrollTrigger: { trigger: el, start: 'top 85%', once: true } });
+      });
+    }, el);
+    return () => ctx.revert();
+  }, []);
+
   const filtered =
     selectedRiskFilter === 'ALL'
       ? activeIncidents
       : activeIncidents.filter((i) => i.level === selectedRiskFilter);
 
   return (
-    <section className="relative py-20 sm:py-28 pattern-radar-rings border-t border-[#2A2D35] text-[#FAF9F6] overflow-hidden">
+    <section className="relative py-16 sm:py-24 text-[#FAF9F6] overflow-hidden">
       <div className="max-w-7xl 2xl:max-w-[1680px] 3xl:max-w-[1980px] 4xl:max-w-[2400px] mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="max-w-3xl mb-10 space-y-3.5">
-          <div className="flex items-center gap-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 shadow-2xs text-white">
-              <span className="flex h-2 w-2 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D4F826] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#9BBD00]"></span>
-              </span>
-              <span className="text-[11px] font-mono font-semibold tracking-wider uppercase">
-                SECTION 09 · OPERATIONAL COMMAND COCKPIT &amp; RESCUE INCIDENT CONSOLE
-              </span>
-            </div>
-            <span className="text-[10px] font-mono text-slate-400 border-l border-white/20 pl-2 hidden sm:inline">
-              DISTRICT EOC 1077 · DIRECT NDRF / KSDMA DISPATCH
-            </span>
-          </div>
-
-          <h2 className="font-display font-extrabold text-3xl sm:text-5xl lg:text-6xl text-white tracking-tight leading-[1.08]">
-            OPERATIONAL <br />
-            <span className="italic font-normal font-serif text-[#D4F826] underline decoration-white/30 decoration-4 underline-offset-8">
-              COMMAND CENTER.
-            </span>
-          </h2>
-
-          <p className="font-sans text-base sm:text-lg text-slate-300 leading-relaxed pt-1">
-            Certified disaster managers triage live sensor anomalies, verify incoming citizen SOS pins, 
-            and coordinate emergency response teams across the Wayanad topography in real time.
-          </p>
-        </div>
+        <ScrollHeading
+          theme="dark"
+          badge="OPERATIONAL COMMAND COCKPIT · RESCUE INCIDENT CONSOLE"
+          title="OPERATIONAL"
+          italicWord="COMMAND CENTER."
+          subtitle="Certified disaster managers triage live sensor anomalies, verify incoming citizen SOS pins, and coordinate emergency response teams across the Wayanad topography in real time."
+        />
 
         {/* Command Center Mockup Screen - Tactical Dark Container */}
-        <div className="rounded-3xl bg-[#121316] border border-[#2B2E37] p-6 sm:p-8 space-y-6 shadow-2xl">
+        <div ref={board} className="glow-card rounded-[2.5rem] glass-dark p-6 sm:p-8 space-y-6 shadow-[0_60px_140px_-50px_rgba(0,0,0,0.8)] will-change-transform">
           {/* Header Bar */}
           <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-white/10">
             <div className="flex items-center gap-3">
@@ -231,13 +226,15 @@ export const AdminCommandPreview: React.FC = () => {
                 <span>3D SITUATIONAL MAP</span>
               </Link>
 
-              <Link
-                to="/app"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#D4F826] hover:bg-[#c2e420] text-[#181A1E] font-mono text-xs font-bold shadow-md transition-all"
-              >
-                <Terminal className="h-3.5 w-3.5" />
-                <span>LAUNCH COMMAND CENTER</span>
-              </Link>
+              <Magnetic>
+                <Link
+                  to="/app"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#D4F826] hover:bg-[#c2e420] text-[#181A1E] font-mono text-xs font-bold shadow-md transition-all"
+                >
+                  <Terminal className="h-3.5 w-3.5" />
+                  <span>LAUNCH COMMAND CENTER</span>
+                </Link>
+              </Magnetic>
             </div>
           </div>
         </div>

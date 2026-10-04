@@ -3,7 +3,6 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Layout } from './components/Layout';
-import LandingPage from './pages/LandingPage';
 import FloodGuardLoader from './components/FloodGuardLoader';
 import { CommandCenterErrorBoundary } from './components/Wayanad/ErrorBoundary';
 
@@ -22,6 +21,14 @@ const AIAssistant = lazy(() => import('./pages/AIAssistant'));
 const Settings = lazy(() => import('./pages/Settings'));
 const Login = lazy(() => import('./pages/Login'));
 const EmergencyApp = lazy(() => import('./pages/EmergencyApp'));
+// The landing page carries the scroll-story engine (GSAP, Lenis); keep it out of the bundle every other
+// route (including the 3D map) loads. Paper-coloured fallback = no loader flash on the homepage.
+const LandingPageLazy = lazy(() => import('./pages/LandingPage'));
+const LandingPage: React.FC = () => (
+  <Suspense fallback={<div className="min-h-screen bg-[#EBE8E0]" />}>
+    <LandingPageLazy />
+  </Suspense>
+);
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { LocationProvider } from './context/LocationContext';
 import './styles/globals.css';

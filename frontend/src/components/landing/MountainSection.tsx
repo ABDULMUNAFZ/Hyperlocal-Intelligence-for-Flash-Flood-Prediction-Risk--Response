@@ -1,8 +1,15 @@
-import React, { useState, useMemo } from 'react';
-import { Mountain, Droplets, ArrowDownRight, Wind, Gauge, Layers, Sliders, Info, ArrowUpRight } from 'lucide-react';
+import React, { useState, useMemo, useLayoutEffect, useRef } from 'react';
+import { gsap, MQ, fitsViewport } from './story/gsap';
+import { Mountain, Droplets, Layers, Sliders } from 'lucide-react';
 import { DataHonestyBadge } from './DataHonestyBadge';
 import { MountainHillsIllustration } from './MountainHillsIllustration';
 import { ScrollHeading } from './ScrollHeading';
+
+const RISK_LADDER = [
+  { label: 'MODERATE RUNOFF', desc: 'Channels fill within standard drainage margins.', cls: 'border-amber-300 bg-amber-50 text-amber-900', dot: 'bg-amber-500' },
+  { label: 'HIGH RAPID INUNDATION', desc: 'Overland sheet flow turns into torrential streams on slopes above 30°.', cls: 'border-orange-300 bg-orange-50 text-orange-900', dot: 'bg-orange-500' },
+  { label: 'CRITICAL FLASH SURGE & LANDSLIDE RISK', desc: 'Rapid water rise with extreme slope shear stress. Valley bridges overwhelmed in < 35 min.', cls: 'border-rose-300 bg-rose-50 text-rose-900', dot: 'bg-rose-600' },
+];
 
 export const MountainSection: React.FC = () => {
   // Interactive slope physics simulator state
@@ -52,8 +59,50 @@ export const MountainSection: React.FC = () => {
     };
   }, [slopeDeg, rainfallMmH, soilSaturation]);
 
+  const scene = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const el = scene.current;
+    if (!el) return;
+    const ctx = gsap.context(() => {
+      gsap.matchMedia().add(MQ.desktop, () => {
+        const pin = fitsViewport(el, 100);
+        const draw = (sel: string) => el.querySelectorAll<SVGPathElement>(sel).forEach((p) => {
+          const len = p.getTotalLength();
+          gsap.set(p, { strokeDasharray: len, strokeDashoffset: len });
+        });
+        draw('[data-draw]');
+        gsap.set('[data-ridge-fill]', { fillOpacity: 0 });
+        gsap.set('[data-fadein]', { opacity: 0 });
+        gsap.set('[data-pool]', { scale: 0, transformOrigin: '50% 50%' });
+        gsap.set('[data-ladder]', { opacity: 0, x: 40 });
+        gsap.set('[data-drop]', { opacity: 0 });
+        const tl = gsap.timeline({
+          defaults: { ease: 'none' },
+          scrollTrigger: { trigger: el, start: pin ? 'top top+=96' : 'top 85%', end: pin ? '+=170%' : 'top 20%', scrub: 0.7, pin },
+        });
+        tl.to('[data-contour]', { strokeDashoffset: 0, duration: 1, stagger: 0.15 })
+          .to('[data-draw-ridge]', { strokeDashoffset: 0, duration: 1.2 }, '<0.2')
+          .to('[data-ridge-fill]', { fillOpacity: 1, duration: 0.6 }, '-=0.4')
+          .to('[data-fadein="soil"]', { opacity: 1, duration: 0.8 }, '<')
+          .to('[data-fadein="rain"]', { opacity: 1, duration: 0.5 }, '<')
+          .to('[data-fadein="label-1"]', { opacity: 1, duration: 0.3 })
+          .set('[data-drop]', { opacity: 1 })
+          .to('[data-drop]', { motionPath: { path: '#mtn-runoff', align: '#mtn-runoff', alignOrigin: [0.5, 0.5] }, duration: 2.2, ease: 'power1.in' })
+          .to('[data-fadein="runoff"]', { opacity: 1, duration: 0.6 }, '<')
+          .to('[data-ladder="0"]', { opacity: 1, x: 0, duration: 0.5 }, '<0.2')
+          .to('[data-fadein="label-2"]', { opacity: 1, duration: 0.3 }, '<0.5')
+          .to('[data-ladder="1"]', { opacity: 1, x: 0, duration: 0.5 }, '<0.3')
+          .to('[data-pool]', { scale: 1, duration: 0.8, ease: 'back.out(1.6)' }, '-=0.4')
+          .to('[data-fadein="label-3"]', { opacity: 1, duration: 0.3 }, '<')
+          .to('[data-ladder="2"]', { opacity: 1, x: 0, duration: 0.5 }, '<0.2')
+          .to({}, { duration: 0.6 });
+      });
+    }, el);
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <section id="mountain" className="relative py-20 sm:py-28 pattern-topo-grid border-t border-[#DDD9CE] text-[#181A1E] overflow-hidden">
+    <section className="relative py-16 sm:py-24 pattern-topo-grid text-[#181A1E] overflow-hidden">
       {/* Real Mountain Hill Illustration Backdrop */}
       <div className="absolute inset-x-0 bottom-0 h-64 pointer-events-none opacity-20">
         <MountainHillsIllustration variant="section-backdrop" showContourGrid={false} className="h-full" />
@@ -70,7 +119,7 @@ export const MountainSection: React.FC = () => {
         />
 
         {/* Dynamic Mountain Cross-Section & Hydrology Diagram */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div ref={scene} className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
           {/* Visual Canvas Diagram (7 cols) - Geological Strata Slate */}
           <div className="lg:col-span-7 bg-white rounded-3xl border-2 border-[#181A1E]/15 p-6 shadow-xl relative overflow-hidden group hover:border-[#181A1E] transition-all">
             {/* Topographic Altitude Scale Ruler on Top */}
@@ -122,7 +171,13 @@ export const MountainSection: React.FC = () => {
                   opacity="0.5"
                 />
 
+                {/* Elevation contour lines (drawn in on scroll) */}
+                {[0, 1, 2, 3].map((i) => (
+                  <path key={`c${i}`} data-draw data-contour d={`M 0 ${150 + i * 34} Q 120 ${120 + i * 36} 240 ${200 + i * 30} T 600 ${300 + i * 10}`} fill="none" stroke="#574974" strokeOpacity="0.18" strokeWidth="1" />
+                ))}
+
                 {/* Rain droplet trajectories following wind vector */}
+                <g data-fadein="rain">
                 {[...Array(24)].map((_, i) => (
                   <line
                     key={i}
@@ -136,9 +191,13 @@ export const MountainSection: React.FC = () => {
                     opacity="0.55"
                   />
                 ))}
+                </g>
 
                 {/* Mountain Ridge Profile */}
                 <path
+                  data-draw
+                  data-draw-ridge
+                  data-ridge-fill
                   d="M 0 360 L 0 110 Q 70 85 120 135 T 240 190 T 380 260 Q 450 295 520 300 T 600 305 L 600 360 Z"
                   fill="url(#slopeFillLight)"
                   stroke="#574974"
@@ -147,6 +206,7 @@ export const MountainSection: React.FC = () => {
 
                 {/* Subsurface saturated soil horizon */}
                 <path
+                  data-fadein="soil"
                   d="M 0 130 Q 70 105 120 155 T 240 208 T 380 275 Q 450 308 520 312 T 600 316 L 600 335 L 0 335 Z"
                   fill="url(#soilLayerLight)"
                   stroke="#d97706"
@@ -156,6 +216,8 @@ export const MountainSection: React.FC = () => {
 
                 {/* Water runoff flow vectors down the slope */}
                 <path
+                  id="mtn-runoff"
+                  data-fadein="runoff"
                   d="M 125 142 Q 180 185 240 200 Q 310 240 380 268 Q 440 295 510 304"
                   fill="none"
                   stroke="url(#waterFlowLight)"
@@ -164,12 +226,18 @@ export const MountainSection: React.FC = () => {
                 />
 
                 {/* Valley Flood Accumulation Pool */}
-                <ellipse cx="530" cy="318" rx="65" ry="18" fill="#818cf8" opacity="0.6" />
-                <ellipse cx="530" cy="318" rx="45" ry="10" fill="#6366f1" opacity="0.85" />
+                <g data-pool>
+                  <ellipse cx="530" cy="318" rx="65" ry="18" fill="#818cf8" opacity="0.6" />
+                  <ellipse cx="530" cy="318" rx="45" ry="10" fill="#6366f1" opacity="0.85" />
+                </g>
+
+                {/* The droplet that travels down the runoff path on scroll */}
+                <circle data-drop cx="0" cy="0" r="6.5" fill="#2563eb" stroke="#ffffff" strokeWidth="2.5" opacity="0" />
 
                 {/* Elevation Markers & Text Labels */}
                 <g className="font-mono text-[10px] fill-[#141518]">
                   {/* Chembra Peak */}
+                  <g data-fadein="label-1">
                   <circle cx="120" cy="135" r="4.5" fill="#141518" />
                   <text x="130" y="130" fill="#141518" fontWeight="bold">
                     CHEMBRA RIDGE (2,100m)
@@ -177,8 +245,10 @@ export const MountainSection: React.FC = () => {
                   <text x="130" y="144" fill="#6A6D75" fontSize="8.5">
                     Cloudburst catchment zone
                   </text>
+                  </g>
 
                   {/* Mid Slope Debris Zone */}
+                  <g data-fadein="label-2">
                   <circle cx="280" cy="215" r="4.5" fill="#7c3aed" />
                   <text x="292" y="212" fill="#141518" fontWeight="bold">
                     STEEP ESCARPMENT (38°–55°)
@@ -186,8 +256,10 @@ export const MountainSection: React.FC = () => {
                   <text x="292" y="225" fill="#6A6D75" fontSize="8.5">
                     Soil pore-pressure saturation
                   </text>
+                  </g>
 
                   {/* Valley Confluence */}
+                  <g data-fadein="label-3">
                   <circle cx="490" cy="290" r="4.5" fill="#e11d48" />
                   <text x="410" y="280" fill="#e11d48" fontWeight="bold">
                     VALLEY SETTLEMENT (720m)
@@ -195,12 +267,34 @@ export const MountainSection: React.FC = () => {
                   <text x="410" y="293" fill="#be123c" fontSize="8.5">
                     River surge & Bridge choke point
                   </text>
+                  </g>
                 </g>
               </svg>
             </div>
 
+          </div>
+
+          {/* Risk ladder — appears step by step as the water travels down the slope */}
+          <div className="lg:col-span-5 space-y-3">
+            <div className="font-mono text-[11px] font-bold tracking-[0.2em] text-[#6A6D75]">AS THE WATER MOVES DOWN THE SLOPE</div>
+            {RISK_LADDER.map((r, i) => (
+              <div key={r.label} data-ladder={i} className={`flex items-start gap-3 rounded-3xl border p-4 shadow-sm ${r.cls}`}>
+                <span className={`mt-1 h-3 w-3 flex-none rounded-full ${r.dot}`} />
+                <div>
+                  <div className="font-mono text-xs font-bold tracking-wider">{r.label}</div>
+                  <div className="mt-1 text-[12.5px] leading-snug opacity-90">{r.desc}</div>
+                </div>
+              </div>
+            ))}
+            <div className="text-[11px] font-mono text-[#6A6D75]">Thresholds follow the slope calculator below — try your own numbers.</div>
+          </div>
+        </div>
+
+        {/* Stages + interactive calculator */}
+        <div className="mt-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start" data-reveal>
+          <div className="lg:col-span-7">
             {/* Hydrological Stages Breakdown */}
-            <div className="grid grid-cols-3 gap-3 mt-6 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
               <div className="p-3.5 rounded-2xl bg-[#FAF9F6] border border-[#E6E4DE]">
                 <div className="font-bold text-[#141518] font-mono">1. CLOUDBURST</div>
                 <div className="text-[#555861] mt-1 leading-normal">

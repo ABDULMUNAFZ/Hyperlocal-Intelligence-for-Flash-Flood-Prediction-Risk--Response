@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useLayoutEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowRight,
@@ -7,12 +7,33 @@ import {
 } from 'lucide-react';
 import { LazyDither as Dither } from '../react-bits/lazy';
 import FloodComparisonViewer from './FloodComparisonViewer';
+import { gsap, MQ } from './story/gsap';
 
 export const HeroSection: React.FC = () => {
   const navigate = useNavigate();
+  const sectionRef = useRef<HTMLElement>(null);
+
+  // Story motion only — the hero layout itself is unchanged:
+  //  • entrance: text blocks rise in (staggered), the frame settles from 0.96 → 1 (no opacity, so LCP is unaffected)
+  //  • exit: while scrolling away the hero shrinks slightly, rounds its corners and dissolves into the prologue
+  useLayoutEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const ctx = gsap.context(() => {
+      const mm = gsap.matchMedia();
+      mm.add(`${MQ.desktop}, ${MQ.mobile}`, () => {
+        gsap.from('[data-hero-in]', { opacity: 0, y: 26, duration: 0.9, ease: 'power3.out', stagger: 0.09, delay: 0.05 });
+        gsap.from('[data-hero-frame]', { scale: 0.96, duration: 1.2, ease: 'power3.out' });
+        gsap.timeline({ scrollTrigger: { trigger: el, start: 'top top', end: 'bottom top', scrub: 0.5 } })
+          .to(el, { scale: 0.93, borderRadius: 48, ease: 'none', duration: 1 }, 0)
+          .to(el, { opacity: 0, filter: 'blur(6px)', ease: 'power1.in', duration: 0.55 }, 0.45);
+      });
+    }, el);
+    return () => ctx.revert();
+  }, []);
 
   return (
-    <section className="relative min-h-[96vh] flex flex-col justify-center pt-24 pb-12 overflow-hidden bg-[#EBE8E0] text-[#181A1E]">
+    <section ref={sectionRef} className="relative min-h-[96vh] flex flex-col justify-center pt-24 pb-12 overflow-hidden bg-[#EBE8E0] text-[#181A1E] origin-[50%_30%]">
       {/* React Bits Dither Wave Background Animation for Homepage First Page */}
       <div className="absolute inset-0 pointer-events-none opacity-35 z-0 overflow-hidden">
         <Dither
@@ -45,7 +66,7 @@ export const HeroSection: React.FC = () => {
         {/* DESKTOP HERO ARCHITECTURE (>= 1024px) - EXACT DEFAULT REFERENCE MATCH */}
         <div className="hidden lg:block relative w-full h-[690px]">
           {/* 1. OUTSIDE TOP-LEFT NOTCH (Sitting in the upper-left cutout) */}
-          <div className="absolute top-0 left-2 z-30 max-w-lg select-none">
+          <div data-hero-in className="absolute top-0 left-2 z-30 max-w-lg select-none">
             <div className="font-mono text-sm tracking-widest text-[#45474E] uppercase flex items-center gap-1.5 font-medium">
               <span className="text-[#181A1E] font-bold">: //</span> BRINGING DATA TO REAL LIFE
             </div>
@@ -60,6 +81,7 @@ export const HeroSection: React.FC = () => {
 
           {/* 2. THE CENTER DARK CURVED FRAME - Click to open 3D Map */}
           <div
+            data-hero-frame
             onClick={() => navigate('/app/map')}
             className="absolute inset-0 z-10 bg-[#0B0D11] border border-[#262830] shadow-2xl overflow-hidden cursor-pointer"
             title="Click image to enter 3D Map"
@@ -129,7 +151,7 @@ export const HeroSection: React.FC = () => {
           </div>
 
           {/* 3. OUTSIDE BOTTOM-RIGHT NOTCH: BUTTON MOVED UP (BIGGER & LENGTHIER), HEADING BROUGHT DOWN */}
-          <div className="absolute bottom-3 right-6 lg:right-8 z-30 text-right select-none flex flex-col items-end gap-2.5">
+          <div data-hero-in className="absolute bottom-3 right-6 lg:right-8 z-30 text-right select-none flex flex-col items-end gap-2.5">
             {/* BIGGER & LENGTHIER BUTTON MOVED UP */}
             <div>
               <Link
@@ -159,7 +181,7 @@ export const HeroSection: React.FC = () => {
         {/* MOBILE & TABLET HERO ARCHITECTURE (< 1024px) - CLEAN RESPONSIVE STACK */}
         <div className="block lg:hidden space-y-6">
           {/* Mobile Top Heading */}
-          <div className="text-center sm:text-left space-y-2">
+          <div data-hero-in className="text-center sm:text-left space-y-2">
             <div className="font-mono text-xs tracking-widest text-[#45474E] uppercase flex items-center justify-center sm:justify-start gap-1.5 font-medium">
               <span className="text-[#181A1E] font-bold">: //</span> BRINGING DATA TO REAL LIFE
             </div>
@@ -173,6 +195,7 @@ export const HeroSection: React.FC = () => {
 
           {/* Mobile Center Comparison Frame - Click to open 3D Map */}
           <div
+            data-hero-frame
             onClick={() => navigate('/app/map')}
             className="relative w-full h-[460px] rounded-[2.5rem] bg-[#0B0D11] border border-[#262830] shadow-xl overflow-hidden cursor-pointer"
             title="Click image to enter 3D Map"
@@ -201,7 +224,7 @@ export const HeroSection: React.FC = () => {
           </div>
 
           {/* Mobile Bottom: Button Moved Up (Bigger & Lengthier), Heading Brought Down */}
-          <div className="text-center sm:text-right space-y-3 pt-2">
+          <div data-hero-in className="text-center sm:text-right space-y-3 pt-2">
             {/* BIGGER & LENGTHIER BUTTON (MOVED UP) */}
             <div>
               <Link
@@ -226,7 +249,7 @@ export const HeroSection: React.FC = () => {
         </div>
 
         {/* District Running Ticker Bar Below Hero */}
-        <div className="relative z-20 w-full mt-10 py-3.5 bg-[#181A1E] text-[#FAF9F6] rounded-2xl border border-[#2A2D35] shadow-xs overflow-hidden">
+        <div data-hero-in className="relative z-20 w-full mt-10 py-3.5 bg-[#181A1E] text-[#FAF9F6] rounded-2xl border border-[#2A2D35] shadow-xs overflow-hidden">
           <div className="marquee-track">
             <div className="marquee-content font-mono text-xs sm:text-sm tracking-wider uppercase">
               <span className="text-[#D4F826]">◆ HYPERLOCAL FLASH-FLOOD INTELLIGENCE FOR WAYANAD</span>

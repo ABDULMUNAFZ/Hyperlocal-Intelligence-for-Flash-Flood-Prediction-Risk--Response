@@ -15,10 +15,34 @@ import {
   Github,
 } from 'lucide-react';
 import FloodGuardLogo from '../common/FloodGuardLogo';
+import { useStory, DARK_MOODS } from './story/storyStore';
+import { ScrollProgress } from './story/ScrollProgress';
+import { MOUNT_ALL_EVENT } from './story/LazyChapter';
+import { useLenis, scrollToTarget } from './story/SmoothScrollProvider';
+import { ScrollTrigger } from './story/gsap';
 
 export const LandingNav: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { chapter, mood } = useStory();
+  const lenis = useLenis();
+  const dark = DARK_MOODS.includes(mood) && scrolled;
+
+  /** In-page chapter links: mount every lazy chapter first so positions are final, then glide there. */
+  const goToChapter = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (!href.startsWith('#')) return;
+    e.preventDefault();
+    setMobileMenuOpen(false);
+    window.dispatchEvent(new Event(MOUNT_ALL_EVENT));
+    let tries = 0;
+    const go = () => {
+      const target = document.querySelector(href);
+      if (!target && tries++ < 30) { window.setTimeout(go, 100); return; }
+      ScrollTrigger.refresh();
+      requestAnimationFrame(() => scrollToTarget(lenis, href, -84));
+    };
+    requestAnimationFrame(() => requestAnimationFrame(go));
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -39,8 +63,10 @@ export const LandingNav: React.FC = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${
-        scrolled
+      className={`fixed top-0 left-0 right-0 z-50 transition-[background-color,border-color,padding] duration-500 ${
+        dark
+          ? 'bg-[#0B0D11]/70 backdrop-blur-xl border-b border-white/10 shadow-xs py-2'
+          : scrolled
           ? 'bg-[#EBE8E0]/95 backdrop-blur-xl border-b border-[#DDD9CE] shadow-xs py-2'
           : 'bg-[#EBE8E0]/85 backdrop-blur-md border-b border-[#DDD9CE]/60 py-3'
       }`}
@@ -59,7 +85,7 @@ export const LandingNav: React.FC = () => {
             </div>
             <div className="flex flex-col">
               <div className="flex items-center gap-2">
-                <span className="font-display font-extrabold text-lg sm:text-xl tracking-tight text-[#181A1E]">
+                <span className={`font-display font-extrabold text-lg sm:text-xl tracking-tight transition-colors duration-500 ${dark ? 'text-white' : 'text-[#181A1E]'}`}>
                   FloodGuard
                 </span>
                 <span className="px-2 py-0.5 rounded-full bg-[#181A1E] text-[#D4F826] text-[9.5px] font-mono font-bold tracking-widest uppercase">
@@ -73,16 +99,23 @@ export const LandingNav: React.FC = () => {
           </Link>
 
           {/* Desktop Capsule Nav (Clinical Category Navigation Pills) */}
-          <nav className="hidden lg:flex items-center gap-1.5 xl:gap-2 bg-white/90 px-3.5 py-1.5 rounded-full border border-[#DDD9CE] shadow-2xs">
+          <nav className={`hidden lg:flex items-center gap-1.5 xl:gap-2 px-3.5 py-1.5 rounded-full border shadow-2xs transition-colors duration-500 ${dark ? 'bg-white/10 border-white/15' : 'bg-white/90 border-[#DDD9CE]'}`}>
             {navItems.map((item) => {
               const Icon = item.icon;
+              const active = item.href === `#${chapter}`;
               return (
                 <a
                   key={item.label}
                   href={item.href}
-                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-sans font-medium text-[#45474E] hover:text-[#181A1E] hover:bg-[#F3F1EA] transition-all"
+                  onClick={(e) => goToChapter(e, item.href)}
+                  aria-current={active ? 'true' : undefined}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-sans font-medium transition-all ${
+                    active
+                      ? dark ? 'bg-[#D4F826] text-[#181A1E]' : 'bg-[#181A1E] text-[#D4F826]'
+                      : dark ? 'text-white/70 hover:text-white hover:bg-white/10' : 'text-[#45474E] hover:text-[#181A1E] hover:bg-[#F3F1EA]'
+                  }`}
                 >
-                  <Icon className="h-3.5 w-3.5 text-[#656872]" />
+                  <Icon className={`h-3.5 w-3.5 ${active ? '' : dark ? 'text-white/60' : 'text-[#656872]'}`} />
                   <span>{item.label}</span>
                 </a>
               );
@@ -96,10 +129,10 @@ export const LandingNav: React.FC = () => {
               href="https://github.com/ABDULMUNAFZ/Hyperlocal-Intelligence-for-Flash-Flood-Prediction-Risk--Response"
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-white hover:bg-[#F3F1EA] border border-[#DDD9CE] text-[#181A1E] text-xs font-mono font-medium shadow-xs transition-all hover:scale-[1.03]"
+              className={`hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-full border text-xs font-mono font-medium shadow-xs transition-all hover:scale-[1.03] ${dark ? 'bg-white/10 hover:bg-white/15 border-white/15 text-white' : 'bg-white hover:bg-[#F3F1EA] border-[#DDD9CE] text-[#181A1E]'}`}
               title="Star this repository on GitHub"
             >
-              <Github className="h-4 w-4 text-[#181A1E]" />
+              <Github className={`h-4 w-4 ${dark ? 'text-white' : 'text-[#181A1E]'}`} />
               <span className="hidden md:inline font-sans font-semibold">Star repo</span>
               <span className="px-2 py-0.5 rounded-full bg-[#181A1E] text-[#D4F826] text-[10.5px] font-bold">★ GitHub</span>
             </a>
@@ -137,6 +170,9 @@ export const LandingNav: React.FC = () => {
         </div>
       </div>
 
+      {/* Page progress through the story */}
+      <ScrollProgress className="absolute inset-x-0 bottom-0 h-[2px]" barClassName={dark ? 'bg-[#D4F826]' : 'bg-[#181A1E]'} />
+
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
         <div className="lg:hidden mt-2 mx-4 p-4 rounded-3xl bg-white border border-[#DDD9CE] shadow-xl space-y-2">
@@ -146,7 +182,7 @@ export const LandingNav: React.FC = () => {
               <a
                 key={item.label}
                 href={item.href}
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={(e) => (item.href.startsWith('#') ? goToChapter(e, item.href) : setMobileMenuOpen(false))}
                 className="flex items-center gap-2.5 px-4 py-2.5 rounded-2xl text-sm font-medium text-[#23252A] hover:bg-[#F4F2EB]"
               >
                 <Icon className="h-4 w-4 text-[#656872]" />

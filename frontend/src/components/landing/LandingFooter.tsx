@@ -1,14 +1,20 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Terminal, Compass, ArrowRight, Github } from 'lucide-react';
+import { Terminal, Compass, Github, LifeBuoy } from 'lucide-react';
+import { Magnetic } from './story/Magnetic';
+import { ParallaxLayer } from './story/ParallaxLayer';
 import FloodGuardLogo from '../common/FloodGuardLogo';
 
 export const LandingFooter: React.FC = () => {
   return (
-    <footer className="relative bg-[#141518] text-[#F6F5F2] pt-16 pb-12 overflow-hidden border-t border-[#26282E]">
-      <div className="relative max-w-7xl 2xl:max-w-[1680px] 3xl:max-w-[1980px] 4xl:max-w-[2400px] mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+    <footer className="relative text-[#F6F5F2] pt-6 pb-10 overflow-hidden">
+      {/* dawn: a soft sun rising behind the closing call to action */}
+      <ParallaxLayer speed={0.35} className="pointer-events-none absolute left-1/2 top-24 -translate-x-1/2">
+        <div className="h-[46rem] w-[46rem] rounded-full bg-[radial-gradient(circle,rgba(255,214,150,0.75)_0%,rgba(255,190,120,0.25)_40%,transparent_70%)] blur-2xl" />
+      </ParallaxLayer>
+      <div className="relative max-w-7xl 2xl:max-w-[1680px] 3xl:max-w-[1980px] 4xl:max-w-[2400px] mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         {/* Big Final CTA Banner */}
-        <div className="p-8 sm:p-14 rounded-3xl bg-[#EBE8E0] text-[#141518] border border-[#DDD9CE] text-center space-y-6 shadow-xl relative overflow-hidden">
+        <div data-reveal className="p-8 sm:p-16 rounded-[2.5rem] bg-white/55 backdrop-blur-xl text-[#141518] border border-white/70 text-center space-y-6 shadow-[0_50px_120px_-50px_rgba(120,70,20,0.45)] relative overflow-hidden">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#181A1E] text-white font-mono text-xs font-bold uppercase tracking-wider">
             <span className="h-1.5 w-1.5 rounded-full bg-[#D4F826]"></span>
             <span>EARLY ACTION SAVES LIVES</span>
@@ -27,27 +33,40 @@ export const LandingFooter: React.FC = () => {
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-4 pt-3">
+            <Magnetic>
+              <Link
+                to="/app/map"
+                className="inline-flex items-center gap-2.5 px-8 py-4 rounded-full bg-[#141518] hover:bg-[#252830] text-white font-bold text-sm sm:text-base shadow-lg transition-colors"
+              >
+                <span className="h-2.5 w-2.5 rounded-full bg-[#D4F826] shadow-[0_0_10px_#D4F826]" />
+                <span>OPEN THE 3D MAP</span>
+                <Compass className="h-4 w-4 text-[#D4F826]" />
+              </Link>
+            </Magnetic>
+
+            <Magnetic>
+              <Link
+                to="/emergency"
+                className="inline-flex items-center gap-2 px-7 py-4 rounded-full bg-white hover:bg-rose-50 border border-rose-200 text-rose-700 font-bold text-sm sm:text-base shadow-sm transition-colors"
+              >
+                <LifeBuoy className="h-4 w-4" />
+                <span>CITIZEN SOS APP</span>
+              </Link>
+            </Magnetic>
+
             <Link
               to="/app"
-              className="inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-[#141518] hover:bg-[#252830] text-white font-bold text-sm sm:text-base shadow-md transition-all transform hover:-translate-y-0.5"
+              className="inline-flex items-center gap-2 px-6 py-4 rounded-full bg-white/80 hover:bg-white border border-[#DDD9CE] text-[#141518] font-semibold text-sm sm:text-base shadow-sm transition-colors"
             >
               <Terminal className="h-4 w-4" />
               <span>ENTER COMMAND CENTER</span>
-            </Link>
-
-            <Link
-              to="/app/map"
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-white hover:bg-[#FAF9F6] border border-[#DDD9CE] text-[#141518] font-semibold text-sm sm:text-base shadow-sm transition-all"
-            >
-              <Compass className="h-4 w-4 text-[#181A1E]" />
-              <span>OPEN 3D MAP</span>
             </Link>
 
             <a
               href="https://github.com/ABDULMUNAFZ/Hyperlocal-Intelligence-for-Flash-Flood-Prediction-Risk--Response"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#181A1E] hover:bg-black text-[#D4F826] font-mono text-xs sm:text-sm font-semibold transition-all border border-[#2B2E37] shadow-sm hover:scale-105"
+              className="inline-flex items-center gap-2 px-6 py-4 rounded-full bg-[#181A1E] hover:bg-black text-[#D4F826] font-mono text-xs sm:text-sm font-semibold transition-all border border-[#2B2E37] shadow-sm"
             >
               <Github className="h-4 w-4 text-white" />
               <span>STAR ON GITHUB</span>
@@ -56,6 +75,7 @@ export const LandingFooter: React.FC = () => {
           </div>
         </div>
 
+        <div className="rounded-[2.5rem] bg-[#141518] p-5 sm:p-10 space-y-12 shadow-2xl">
         {/* Official Smart India Hackathon 2026 National Project Accreditation Card */}
         <div className="p-6 sm:p-8 rounded-3xl bg-[#1B1D22] border-2 border-[#2E323D] relative overflow-hidden shadow-2xl">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -205,6 +225,7 @@ export const LandingFooter: React.FC = () => {
               GitHub Repository
             </a>
           </div>
+        </div>
         </div>
       </div>
     </footer>

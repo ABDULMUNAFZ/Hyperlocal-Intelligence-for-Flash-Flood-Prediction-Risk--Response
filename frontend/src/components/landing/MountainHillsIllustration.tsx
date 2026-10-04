@@ -8,7 +8,7 @@ interface MountainHillsIllustrationProps {
 
 export const MountainHillsIllustration: React.FC<MountainHillsIllustrationProps> = ({
   className = '',
-  variant = 'hero-panoramic',
+  variant: _variant = 'hero-panoramic',
   showContourGrid = true,
 }) => {
   return (

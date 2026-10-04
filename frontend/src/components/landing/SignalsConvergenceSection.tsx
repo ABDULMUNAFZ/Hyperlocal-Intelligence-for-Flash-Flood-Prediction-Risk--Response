@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
+import { gsap, MQ } from './story/gsap';
 import {
   CloudRain,
   Radio,
@@ -11,7 +12,6 @@ import {
   Building,
   Video,
   Cpu,
-  ArrowRight,
   ShieldAlert,
   Users,
   Compass as CompassIcon,
@@ -157,9 +157,32 @@ const SIGNALS: SignalItem[] = [
 
 export const SignalsConvergenceSection: React.FC = () => {
   const [selectedSignal, setSelectedSignal] = useState<SignalItem>(SIGNALS[0]);
+  const grid = useRef<HTMLDivElement>(null);
+
+  // Convergence: source cards fly in from the left, outputs from the right, connectors draw into the engine.
+  useLayoutEffect(() => {
+    const el = grid.current;
+    if (!el) return;
+    const ctx = gsap.context(() => {
+      const mm = gsap.matchMedia();
+      mm.add(MQ.desktop, () => {
+        el.querySelectorAll<SVGPathElement>('[data-connector]').forEach((p) => {
+          const len = p.getTotalLength();
+          gsap.set(p, { strokeDasharray: len, strokeDashoffset: len });
+        });
+        const tl = gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: el, start: 'top 90%', end: 'top 30%', scrub: 0.8 } });
+        tl.from('[data-signal]', { x: -160, opacity: 0, rotate: -3, stagger: 0.06, duration: 0.6 })
+          .from('[data-output]', { x: 160, opacity: 0, rotate: 3, stagger: 0.12, duration: 0.6 }, '<0.2')
+          .to('[data-connector]', { strokeDashoffset: 0, duration: 0.8, stagger: 0.1 }, '<0.3')
+          .from('[data-engine]', { scale: 0.82, opacity: 0, duration: 0.6 }, '<0.2')
+          .to('[data-engine]', { boxShadow: '0 0 80px -10px rgba(212,248,38,0.45)', duration: 0.4 });
+      });
+    }, el);
+    return () => ctx.revert();
+  }, []);
 
   return (
-    <section id="signals" className="relative py-20 sm:py-28 pattern-radar-rings border-t border-[#262830] text-[#FAF9F6] overflow-hidden">
+    <section className="relative py-16 sm:py-24 text-[#FAF9F6] overflow-hidden">
       <div className="relative max-w-7xl 2xl:max-w-[1680px] 3xl:max-w-[1980px] 4xl:max-w-[2400px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Animated Scroll Heading with Multi-Sensor Convergence Accent */}
         <ScrollHeading
@@ -172,7 +195,16 @@ export const SignalsConvergenceSection: React.FC = () => {
         />
 
         {/* Convergence Architecture Flow */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div ref={grid} className="relative grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          {/* connector lines from the sources into the engine and out to the outputs (desktop) */}
+          <svg className="pointer-events-none absolute inset-0 hidden h-full w-full lg:block" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            {[22, 38, 50, 62, 78].map((y, i) => (
+              <path key={`l${i}`} data-connector d={`M 40 ${y} C 46 ${y}, 44 50, 50 50`} fill="none" stroke="#D4F826" strokeOpacity="0.45" strokeWidth="0.25" vectorEffect="non-scaling-stroke" strokeDasharray="3 3" />
+            ))}
+            {[30, 50, 70].map((y, i) => (
+              <path key={`r${i}`} data-connector d={`M 70 50 C 74 50, 72 ${y}, 76 ${y}`} fill="none" stroke="#D4F826" strokeOpacity="0.45" strokeWidth="0.25" vectorEffect="non-scaling-stroke" />
+            ))}
+          </svg>
           {/* Signal Stream Chips (5 cols) - Telemetry Rack Architecture */}
           <div className="lg:col-span-5 space-y-2.5">
             <div className="text-xs font-mono text-slate-400 flex items-center justify-between pb-2 border-b border-white/10">
@@ -190,6 +222,7 @@ export const SignalsConvergenceSection: React.FC = () => {
                 return (
                   <button
                     key={sig.id}
+                    data-signal
                     onClick={() => setSelectedSignal(sig)}
                     className={`group relative flex items-center justify-between p-3.5 rounded-2xl border text-left transition-all ${
                       isSelected
@@ -231,7 +264,7 @@ export const SignalsConvergenceSection: React.FC = () => {
 
           {/* Central Convergence Engine Box (4 cols) - Deep Obsidian Card */}
           <div className="lg:col-span-4 flex flex-col items-center">
-            <div className="w-full relative p-6 rounded-3xl bg-[#1A1C23] border border-[#2E323D] shadow-2xl text-center space-y-4">
+            <div data-engine className="glow-card w-full relative p-6 rounded-3xl glass-dark shadow-2xl text-center space-y-4">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[#D4F826] text-[10px] font-mono font-bold tracking-wider uppercase">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#D4F826] animate-pulse"></span>
                 <span>CENTRAL RISK ENGINE</span>
@@ -274,7 +307,7 @@ export const SignalsConvergenceSection: React.FC = () => {
             </div>
 
             {/* Output 1: Risk */}
-            <div className="p-4 rounded-2xl bg-[#1A1C23] border border-rose-500/30 shadow-xs space-y-1.5 hover:border-rose-400 transition-colors">
+            <div data-output className="hover-lift p-4 rounded-3xl glass-dark border-rose-500/30 shadow-xs space-y-1.5 hover:border-rose-400 transition-colors">
               <div className="flex items-center justify-between text-xs font-mono text-rose-400 font-bold">
                 <span className="flex items-center gap-1.5">
                   <ShieldAlert className="h-4 w-4 text-rose-400" /> 1. HYPERLOCAL RISK
@@ -289,7 +322,7 @@ export const SignalsConvergenceSection: React.FC = () => {
             </div>
 
             {/* Output 2: Impact */}
-            <div className="p-4 rounded-2xl bg-[#1A1C23] border border-amber-500/30 shadow-xs space-y-1.5 hover:border-amber-400 transition-colors">
+            <div data-output className="hover-lift p-4 rounded-3xl glass-dark border-amber-500/30 shadow-xs space-y-1.5 hover:border-amber-400 transition-colors">
               <div className="flex items-center justify-between text-xs font-mono text-amber-400 font-bold">
                 <span className="flex items-center gap-1.5">
                   <Users className="h-4 w-4 text-amber-400" /> 2. POPULATION AT RISK
@@ -304,7 +337,7 @@ export const SignalsConvergenceSection: React.FC = () => {
             </div>
 
             {/* Output 3: Route */}
-            <div className="p-4 rounded-2xl bg-[#1A1C23] border border-emerald-500/30 shadow-xs space-y-1.5 hover:border-emerald-400 transition-colors">
+            <div data-output className="hover-lift p-4 rounded-3xl glass-dark border-emerald-500/30 shadow-xs space-y-1.5 hover:border-emerald-400 transition-colors">
               <div className="flex items-center justify-between text-xs font-mono text-emerald-400 font-bold">
                 <span className="flex items-center gap-1.5">
                   <CompassIcon className="h-4 w-4 text-emerald-400" /> 3. SAFE CORRIDORS

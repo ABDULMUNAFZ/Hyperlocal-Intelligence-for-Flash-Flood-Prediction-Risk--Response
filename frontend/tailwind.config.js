@@ -8,6 +8,13 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Landing story tokens
+        paper: { DEFAULT: '#EBE8E0', light: '#FAF9F6', line: '#DDD9CE' },
+        ink: { DEFAULT: '#181A1E', soft: '#23252A', muted: '#52555E' },
+        citron: { DEFAULT: '#D4F826', deep: '#9BBD00' },
+        storm: { DEFAULT: '#0B0D11', night: '#06080C', panel: '#111723' },
+        navy: { DEFAULT: '#081226', deep: '#0D1B35' },
+        dawn: { DEFAULT: '#F4DCC6', glow: '#FFD696' },
         primary: {
           50: '#eff6ff',
           100: '#dbeafe',

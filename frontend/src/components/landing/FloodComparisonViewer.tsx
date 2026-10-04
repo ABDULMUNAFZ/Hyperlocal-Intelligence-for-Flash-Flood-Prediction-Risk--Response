@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeftRight, Eye, ShieldAlert, Sparkles, Droplets, Compass } from 'lucide-react';
+import { ArrowLeftRight, Compass } from 'lucide-react';
 
 interface FloodComparisonViewerProps {
   className?: string;

@@ -1,18 +1,15 @@
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
+import { gsap, MQ, fitsViewport } from './story/gsap';
 import {
   ShieldAlert,
   UserCheck,
   CheckCircle2,
   XCircle,
   AlertOctagon,
-  ArrowRight,
   Send,
-  Bell,
   Eye,
   Activity,
   History,
-  Info,
-  ArrowUpRight,
 } from 'lucide-react';
 import { DataHonestyBadge } from './DataHonestyBadge';
 import { ScrollHeading } from './ScrollHeading';
@@ -46,8 +43,35 @@ export const HumanInTheLoopSection: React.FC = () => {
     setDecisionState('pending');
   };
 
+  // Split-screen scene: the AI flag (left) arrives, then the officer console (right), then the VERIFIED stamp.
+  const split = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const el = split.current;
+    if (!el) return;
+    const ctx = gsap.context(() => {
+      const mm = gsap.matchMedia();
+      mm.add(MQ.desktop, () => {
+        const pin = fitsViewport(el, 100);
+        gsap.set('[data-stamp]', { opacity: 0, scale: 2.4, rotate: -24 });
+        const tl = gsap.timeline({
+          defaults: { ease: 'none' },
+          scrollTrigger: { trigger: el, start: pin ? 'top top+=96' : 'top 85%', end: pin ? '+=110%' : 'top 20%', scrub: 0.7, pin },
+        });
+        tl.from('[data-ai-side]', { xPercent: -14, opacity: 0, filter: 'blur(8px)', duration: 0.6 })
+          .from('[data-ai-row]', { y: 24, opacity: 0, stagger: 0.12, duration: 0.4 }, '<0.2')
+          .from('[data-officer-side]', { xPercent: 14, opacity: 0, filter: 'blur(8px)', duration: 0.6 }, '-=0.2')
+          .to('[data-stamp]', { opacity: 1, scale: 1, rotate: -12, duration: 0.4, ease: 'back.out(2.2)' }, '+=0.15')
+          .to({}, { duration: 0.4 });
+      });
+      mm.add(MQ.mobile, () => {
+        gsap.from('[data-stamp]', { opacity: 0, scale: 2, rotate: -24, duration: 0.6, ease: 'back.out(2)', scrollTrigger: { trigger: el, start: 'top 40%', once: true } });
+      });
+    }, el);
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <section id="human" className="relative py-20 sm:py-28 pattern-triage-blueprint border-t border-[#DDD9CE] text-[#181A1E] overflow-hidden">
+    <section className="relative py-16 sm:py-24 pattern-triage-blueprint text-[#181A1E] overflow-hidden">
       <div className="max-w-7xl 2xl:max-w-[1680px] 3xl:max-w-[1980px] 4xl:max-w-[2400px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Animated Scroll Heading with Human Verification Seal Accent */}
         <ScrollHeading
@@ -59,7 +83,7 @@ export const HumanInTheLoopSection: React.FC = () => {
         />
 
         {/* Governance Pipeline Flow Visualization */}
-        <div className="mb-12 p-6 rounded-3xl bg-white border border-[#E6E4DE] shadow-xs">
+        <div data-reveal className="mb-12 p-6 rounded-3xl bg-white border border-[#E6E4DE] shadow-xs">
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 items-center text-center text-xs font-mono">
             <div className="p-3.5 rounded-2xl bg-[#FAF9F6] border border-[#E6E4DE]">
               <Eye className="h-4 w-4 text-violet-700 mx-auto mb-1.5" />
@@ -94,9 +118,14 @@ export const HumanInTheLoopSection: React.FC = () => {
         </div>
 
         {/* Interactive Admin Verification Simulator */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div ref={split} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Incident Dossier Evidence (7 cols) - White Porcelain Card */}
-          <div className="lg:col-span-7 bg-white rounded-3xl border border-[#E6E4DE] p-6 space-y-5 shadow-sm">
+          <div data-ai-side className="relative lg:col-span-7 bg-white rounded-3xl border border-[#E6E4DE] p-6 space-y-5 shadow-sm">
+            {/* VERIFIED stamp — lands at the end of the scene */}
+            <div data-stamp className="pointer-events-none absolute right-6 top-16 z-10 rotate-[-12deg] rounded-2xl border-4 border-emerald-600 bg-white/85 px-4 py-2 text-center font-mono text-emerald-700 shadow-lg backdrop-blur-sm" aria-hidden="true">
+              <div className="text-2xl font-black tracking-[0.2em]">VERIFIED</div>
+              <div className="text-[9px] font-bold tracking-widest">BY A CERTIFIED OFFICER</div>
+            </div>
             <div className="flex items-center justify-between pb-3 border-b border-[#EAE7DF]">
               <div className="flex items-center gap-2">
                 <span className="h-2.5 w-2.5 rounded-full bg-rose-600 animate-ping" />
@@ -108,7 +137,7 @@ export const HumanInTheLoopSection: React.FC = () => {
             </div>
 
             {/* Target Area Details */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs font-mono">
+            <div data-ai-row className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs font-mono">
               <div className="p-3.5 rounded-2xl bg-[#FAF9F6] border border-[#E6E4DE]">
                 <div className="text-[10px] text-[#6A6D75]">LOCATION ZONE</div>
                 <div className="text-[#141518] font-bold mt-1">Chooralmala Bridge</div>
@@ -127,7 +156,7 @@ export const HumanInTheLoopSection: React.FC = () => {
             </div>
 
             {/* Correlated Evidence Matrix */}
-            <div className="p-4 rounded-2xl bg-[#FAF9F6] border border-[#E6E4DE] space-y-3">
+            <div data-ai-row className="p-4 rounded-2xl bg-[#FAF9F6] border border-[#E6E4DE] space-y-3">
               <div className="text-xs font-mono font-bold text-[#141518] flex items-center justify-between">
                 <span>MULTI-SIGNAL CORRELATION REPORT</span>
                 <span className="text-emerald-700 font-bold">MATCH CONFIDENCE: 94.2%</span>
@@ -150,7 +179,7 @@ export const HumanInTheLoopSection: React.FC = () => {
             </div>
 
             {/* Exposure Assessment */}
-            <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-between text-xs">
+            <div data-ai-row className="p-4 rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-between text-xs">
               <div className="text-rose-950">
                 <strong className="text-rose-800">Estimated Exposed Population:</strong> 1,420 residents · 380 homes within 400m stream buffer
               </div>
@@ -159,7 +188,7 @@ export const HumanInTheLoopSection: React.FC = () => {
           </div>
 
           {/* Officer Decision Console (5 cols) - Lavender Asymmetric Card */}
-          <div className="lg:col-span-5 bg-[#EFEBF7] rounded-3xl asymmetric-card-top-right border border-[#DDD6EE] p-6 space-y-6 shadow-sm">
+          <div data-officer-side className="lg:col-span-5 bg-[#EFEBF7] rounded-3xl asymmetric-card-top-right border border-[#DDD6EE] p-6 space-y-6 shadow-sm">
             <div className="flex items-center justify-between pb-3 border-b border-[#DDD6EE]">
               <div className="flex items-center gap-2">
                 <UserCheck className="h-4 w-4 text-violet-700" />

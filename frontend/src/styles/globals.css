@@ -725,3 +725,63 @@ body {
   transform: translateY(-2px);
 }
 
+
+/* ── Landing story (scroll storytelling) ─────────────────────────────── */
+@layer components {
+.glass-dark {
+  background: rgba(14, 18, 28, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* cursor-aware glow on dark cards (set --mx/--my from JS) */
+.glow-card { position: relative; }
+.glow-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(212, 248, 38, 0.10), transparent 45%);
+}
+.glow-card:hover::before { opacity: 1; }
+
+.hover-lift { transition: transform 0.35s cubic-bezier(.2,.8,.2,1), box-shadow 0.35s ease; }
+.hover-lift:hover { transform: translateY(-4px); }
+}
+
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+.story-blob {
+  position: absolute;
+  width: 46vmax;
+  height: 46vmax;
+  border-radius: 9999px;
+  filter: blur(90px);
+  will-change: transform;
+}
+.story-blob-a { top: -12vmax; left: -10vmax; animation: story-drift-a 38s ease-in-out infinite alternate; }
+.story-blob-b { bottom: -16vmax; right: -12vmax; animation: story-drift-b 46s ease-in-out infinite alternate; }
+@keyframes story-drift-a { from { transform: translate3d(0, 0, 0) scale(1); } to { transform: translate3d(18vw, 14vh, 0) scale(1.15); } }
+@keyframes story-drift-b { from { transform: translate3d(0, 0, 0) scale(1.1); } to { transform: translate3d(-16vw, -12vh, 0) scale(0.95); } }
+
+.story-contours {
+  position: absolute;
+  inset: -10% -10%;
+  width: 120%;
+  height: 120%;
+  animation: story-contour-drift 60s linear infinite alternate;
+  will-change: transform;
+}
+@keyframes story-contour-drift { from { transform: translate3d(-3%, 0, 0); } to { transform: translate3d(3%, -4%, 0); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .story-blob, .story-contours { animation: none !important; }
+  .hover-lift:hover { transform: none; }
+}

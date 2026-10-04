@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { gsap, ScrollTrigger, MQ, fitsViewport } from './story/gsap';
+import { useLenis } from './story/SmoothScrollProvider';
+import { Magnetic } from './story/Magnetic';
 import { Link } from 'react-router-dom';
 import {
-  Sliders,
   AlertTriangle,
   Users,
   Building,
@@ -81,11 +83,69 @@ const SCENARIOS: ScenarioConfig[] = [
   },
 ];
 
+/** Scenario at any rainfall between 50 and 200 mm/6h: linear interpolation between the four modelled runs. */
+function scenarioAt(rain: number): ScenarioConfig & { interpolated: boolean } {
+  const r = Math.max(50, Math.min(200, rain));
+  const hi = SCENARIOS.findIndex((sc) => sc.rainfallMm >= r);
+  const b = SCENARIOS[Math.max(0, hi)];
+  const a = SCENARIOS[Math.max(0, hi - 1)];
+  const t = b.rainfallMm === a.rainfallMm ? 0 : (r - a.rainfallMm) / (b.rainfallMm - a.rainfallMm);
+  const lerp = (x: number, y: number) => x + (y - x) * t;
+  const nearest = t < 0.5 ? a : b;
+  return {
+    ...nearest,
+    rainfallMm: Math.round(r),
+    inundationAreaKm2: Math.round(lerp(a.inundationAreaKm2, b.inundationAreaKm2) * 10) / 10,
+    maxDepthM: Math.round(lerp(a.maxDepthM, b.maxDepthM) * 100) / 100,
+    affectedBuildings: Math.round(lerp(a.affectedBuildings, b.affectedBuildings)),
+    displacedPop: Math.round(lerp(a.displacedPop, b.displacedPop)),
+    cutOffRoadsKm: Math.round(lerp(a.cutOffRoadsKm, b.cutOffRoadsKm) * 10) / 10,
+    interpolated: !SCENARIOS.some((sc) => sc.rainfallMm === Math.round(r)),
+  };
+}
+
 export const SimulationSection: React.FC = () => {
-  const [selectedScenario, setSelectedScenario] = useState<ScenarioConfig>(SCENARIOS[1]);
+  const [rain, setRain] = useState(100);
+  const selectedScenario = useMemo(() => scenarioAt(rain), [rain]);
+  const stage = useRef<HTMLDivElement>(null);
+  const stRef = useRef<ScrollTrigger | null>(null);
+  const lenis = useLenis();
+
+  // Desktop: scroll scrubs rainfall 50 → 200 mm/6h while the simulator is pinned.
+  useLayoutEffect(() => {
+    const el = stage.current;
+    if (!el) return;
+    const ctx = gsap.context(() => {
+      gsap.matchMedia().add(MQ.desktop, () => {
+        const pin = fitsViewport(el, 100);
+        let last = -1;
+        stRef.current = ScrollTrigger.create({
+          trigger: el,
+          start: pin ? 'top top+=96' : 'top 85%',
+          end: pin ? '+=180%' : 'top 20%',
+          pin,
+          scrub: true,
+          onUpdate: (self) => {
+            const r = Math.round(50 + self.progress * 150);
+            if (r !== last) { last = r; setRain(r); }
+          },
+        });
+        return () => { stRef.current = null; };
+      });
+    }, el);
+    return () => ctx.revert();
+  }, []);
+
+  const goTo = (mm: number) => {
+    const st = stRef.current;
+    if (!st) { setRain(mm); return; }
+    const y = st.start + (st.end - st.start) * ((mm - 50) / 150) + 1;
+    if (lenis) lenis.scrollTo(y, { duration: 1 });
+    else window.scrollTo({ top: y });
+  };
 
   return (
-    <section id="simulation" className="relative py-20 sm:py-28 pattern-fluid-chamber border-t border-[#262830] text-[#FAF9F6] overflow-hidden">
+    <section className="relative py-16 sm:py-24 text-[#FAF9F6] overflow-hidden">
       <div className="max-w-7xl 2xl:max-w-[1680px] 3xl:max-w-[1980px] 4xl:max-w-[2400px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Animated Scroll Heading with Scenario Simulation Accent */}
         <ScrollHeading
@@ -97,8 +157,9 @@ export const SimulationSection: React.FC = () => {
           subtitle="Flash flood defense requires proactive foresight. FloodGuard allows emergency managers to simulate synthetic precipitation scenarios before cloudbursts occur, identifying exactly which bridges will be severed and which shelters to pre-activate."
         />
 
+        <div ref={stage}>
         {/* Scenario Controls Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-3xl bg-[#14161E]/95 border-2 border-white/15 mb-8 shadow-2xl">
+        <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-3xl glass-dark mb-6 shadow-2xl">
           <div className="flex items-center gap-2 text-xs font-mono text-white font-bold">
             <span className="h-2 w-2 rounded-full bg-[#D4F826] animate-pulse"></span>
             <span className="tracking-wider uppercase">SECTION 07 · SELECT HYDRAULIC WAVEFRONT SCENARIO:</span>
@@ -110,7 +171,7 @@ export const SimulationSection: React.FC = () => {
               return (
                 <button
                   key={sc.id}
-                  onClick={() => setSelectedScenario(sc)}
+                  onClick={() => goTo(sc.rainfallMm)}
                   className={`px-4 py-2 rounded-full text-xs font-mono font-bold transition-all ${
                     isActive
                       ? 'bg-[#D4F826] text-[#181A1E] shadow-md shadow-[#D4F826]/20'
@@ -131,7 +192,7 @@ export const SimulationSection: React.FC = () => {
         {/* Inundation Simulation Result Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Main Simulation Readout (7 cols) - Dark Tactical Card */}
-          <div className="lg:col-span-7 bg-[#1A1C23] rounded-3xl border border-[#2E3240] p-6 space-y-6 shadow-2xl">
+          <div className="glow-card lg:col-span-7 glass-dark rounded-3xl p-6 space-y-5 shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-white/10">
               <div>
                 <div className="text-xs font-mono text-slate-400">ACTIVE SCENARIO</div>
@@ -156,6 +217,21 @@ export const SimulationSection: React.FC = () => {
             <p className="text-xs text-slate-300 leading-relaxed font-sans">
               {selectedScenario.description}
             </p>
+
+            {/* Rainfall + peak-depth gauges (follow the scroll on desktop) */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="rounded-2xl bg-[#121317]/80 border border-white/10 p-3">
+                <div className="flex justify-between text-[10px] font-mono text-slate-400"><span>RAINFALL / 6 H</span><span className="text-[#D4F826] font-bold">{selectedScenario.rainfallMm} mm</span></div>
+                <div className="mt-2 h-2 rounded-full bg-white/10 overflow-hidden"><div className="h-full rounded-full bg-gradient-to-r from-sky-400 via-amber-400 to-rose-500 transition-[width] duration-150" style={{ width: `${((selectedScenario.rainfallMm - 50) / 150) * 100}%` }} /></div>
+              </div>
+              <div className="rounded-2xl bg-[#121317]/80 border border-white/10 p-3">
+                <div className="flex justify-between text-[10px] font-mono text-slate-400"><span>VALLEY WATER LEVEL</span><span className="text-sky-300 font-bold">{selectedScenario.maxDepthM} m</span></div>
+                <div className="mt-2 h-2 rounded-full bg-white/10 overflow-hidden"><div className="h-full rounded-full bg-sky-400 transition-[width] duration-150" style={{ width: `${(selectedScenario.maxDepthM / 4.2) * 100}%` }} /></div>
+              </div>
+            </div>
+            {selectedScenario.interpolated && (
+              <div className="text-[10px] font-mono text-slate-500">Values between the four modelled scenarios are linearly interpolated.</div>
+            )}
 
             {/* 4 Impact Metric Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -214,18 +290,20 @@ export const SimulationSection: React.FC = () => {
               <span className="text-xs font-mono text-slate-400">
                 Run parameter grid on the live 3D map:
               </span>
-              <Link
-                to="/app/map"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#D4F826] hover:bg-[#c2e420] text-[#181A1E] font-mono text-xs font-bold transition-all shadow-md"
-              >
-                <span>OPEN WHAT-IF SIMULATOR IN 3D</span>
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
+              <Magnetic>
+                <Link
+                  to="/app/map"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#D4F826] hover:bg-[#c2e420] text-[#181A1E] font-mono text-xs font-bold transition-all shadow-md"
+                >
+                  <span>OPEN WHAT-IF SIMULATOR IN 3D</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </Magnetic>
             </div>
           </div>
 
           {/* Human Story Callout Box (5 cols) */}
-          <div className="lg:col-span-5 bg-[#181A22] rounded-3xl border border-[#2E3240] p-6 space-y-5 shadow-2xl text-white">
+          <div className="lg:col-span-5 glass-dark rounded-3xl p-6 space-y-5 shadow-2xl text-white">
             <div className="text-xs font-mono uppercase tracking-[0.2em] text-[#D4F826] font-bold flex items-center gap-1.5">
               <Sparkles className="h-3.5 w-3.5" />
               <span>THE HUMAN IMPACT</span>
@@ -268,6 +346,7 @@ export const SimulationSection: React.FC = () => {
               Early action is not an academic KPI. A 45-minute advance warning is the difference between an orderly evacuation and a midnight rescue.
             </div>
           </div>
+        </div>
         </div>
       </div>
     </section>

@@ -1,5 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { CloudRain, Wind, Droplets, Compass, Clock, Radio, Satellite, RefreshCw, AlertCircle, ArrowUpRight } from 'lucide-react';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
+import { gsap, ScrollTrigger, MQ, fitsViewport } from './story/gsap';
+import { useLenis } from './story/SmoothScrollProvider';
+
+const TIMELINE_IDS = ['t-60', 't-30', 'now', 't+60', 't+180'] as const;
+type TimelineId = (typeof TIMELINE_IDS)[number];
+import { CloudRain, Wind, Droplets, Compass, Clock, Satellite, AlertCircle } from 'lucide-react';
 import { DataHonestyBadge } from './DataHonestyBadge';
 import { ScrollHeading } from './ScrollHeading';
 
@@ -16,7 +21,48 @@ interface LiveWeatherState {
 }
 
 export const WeatherSatelliteSection: React.FC = () => {
-  const [selectedTimeline, setSelectedTimeline] = useState<'t-60' | 't-30' | 'now' | 't+60' | 't+180'>('now');
+  const [selectedTimeline, setSelectedTimeline] = useState<TimelineId>('now');
+  const stage = useRef<HTMLDivElement>(null);
+  const stRef = useRef<ScrollTrigger | null>(null);
+  const lenis = useLenis();
+
+  // Desktop: vertical scroll scrubs the radar timeline T-60 → +3H while the dashboard is pinned.
+  useLayoutEffect(() => {
+    const el = stage.current;
+    if (!el) return;
+    const ctx = gsap.context(() => {
+      gsap.matchMedia().add(MQ.desktop, () => {
+        const pin = fitsViewport(el, 100);
+        let idx = -1;
+        const st = ScrollTrigger.create({
+          trigger: el,
+          start: pin ? 'top top+=96' : 'top 85%',
+          end: pin ? '+=160%' : 'top 20%',
+          pin,
+          scrub: true,
+          onUpdate: (self) => {
+            const p = self.progress;
+            gsap.set('[data-rail-marker]', { left: `${p * 100}%` });
+            gsap.set('[data-legend-fill]', { scaleX: 0.25 + p * 0.75 });
+            const i = Math.min(4, Math.round(p * 4));
+            if (i !== idx) { idx = i; setSelectedTimeline(TIMELINE_IDS[i]); }
+          },
+        });
+        stRef.current = st;
+        return () => { stRef.current = null; };
+      });
+    }, el);
+    return () => ctx.revert();
+  }, []);
+
+  const goTo = (id: TimelineId) => {
+    const st = stRef.current;
+    if (!st) { setSelectedTimeline(id); return; }
+    const i = TIMELINE_IDS.indexOf(id);
+    const y = st.start + (st.end - st.start) * (i / 4) + 2;
+    if (lenis) lenis.scrollTo(y, { duration: 1 });
+    else window.scrollTo({ top: y });
+  };
   const [weather, setWeather] = useState<LiveWeatherState>({
     temp: 22.4,
     humidity: 89,
@@ -28,7 +74,7 @@ export const WeatherSatelliteSection: React.FC = () => {
     source: 'Open-Meteo High-Resolution API',
     isLive: false,
   });
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
 
   // Fetch real Open-Meteo weather for Wayanad (11.6854, 76.1320)
   useEffect(() => {
@@ -84,7 +130,7 @@ export const WeatherSatelliteSection: React.FC = () => {
   ];
 
   return (
-    <section id="weather" className="relative py-20 sm:py-28 pattern-telemetry-mesh border-t border-[#DDD9CE] text-[#23252A] overflow-hidden">
+    <section className="relative py-16 sm:py-24 pattern-telemetry-mesh text-[#23252A] overflow-hidden">
       <div className="max-w-7xl 2xl:max-w-[1680px] 3xl:max-w-[1980px] 4xl:max-w-[2400px] mx-auto px-4 sm:px-6 lg:px-8">
         {/* Animated Scroll Heading with Radar Sweep Accent */}
         <ScrollHeading
@@ -95,6 +141,7 @@ export const WeatherSatelliteSection: React.FC = () => {
           subtitle="Continuous weather telemetry streams capture precipitation volume, convective cloud formation, and atmospheric saturation across the Wayanad plateau with high temporal resolution."
         />
 
+        <div ref={stage}>
         {/* Timeline Selector */}
         <div className="flex items-center justify-between flex-wrap gap-4 pb-6 border-b border-[#EAE7DF]">
           <div className="flex items-center gap-2">
@@ -110,7 +157,7 @@ export const WeatherSatelliteSection: React.FC = () => {
               return (
                 <button
                   key={step.id}
-                  onClick={() => setSelectedTimeline(step.id as any)}
+                  onClick={() => goTo(step.id as TimelineId)}
                   className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all ${
                     isActive
                       ? 'bg-[#141518] text-[#D4F826] font-bold shadow-xs'
@@ -130,6 +177,19 @@ export const WeatherSatelliteSection: React.FC = () => {
             timestamp={weather.timestamp}
             size="sm"
           />
+        </div>
+
+        {/* Horizontal timeline rail (scrubbed by vertical scroll on desktop) */}
+        <div className="relative mt-5 hidden h-8 lg:block" aria-hidden="true">
+          <div className="absolute inset-x-0 top-1/2 h-[3px] -translate-y-1/2 rounded-full bg-gradient-to-r from-cyan-400 via-amber-400 to-rose-500 opacity-40" />
+          {timelineSteps.map((st, i) => (
+            <div key={st.id} className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2" style={{ left: `${i * 25}%` }}>
+              <div className={`h-3 w-3 rounded-full border-2 ${selectedTimeline === st.id ? 'border-[#141518] bg-[#D4F826]' : 'border-[#141518]/40 bg-white'}`} />
+            </div>
+          ))}
+          <div data-rail-marker className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2" style={{ left: '50%' }}>
+            <div className="rounded-full bg-[#141518] px-2.5 py-0.5 font-mono text-[10px] font-bold text-[#D4F826] shadow-lg">{timelineSteps.find((s) => s.id === selectedTimeline)?.label}</div>
+          </div>
         </div>
 
         {/* Main Observation Dashboard */}
@@ -198,6 +258,11 @@ export const WeatherSatelliteSection: React.FC = () => {
                 </div>
                 <span>RANGE: 80 KM RADIUS</span>
               </div>
+            </div>
+
+            {/* dBZ intensity fills as the storm grows (scroll-driven on desktop) */}
+            <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-[#EAE7DF]" aria-hidden="true">
+              <div data-legend-fill className="h-full w-full origin-left rounded-full bg-gradient-to-r from-cyan-500 via-emerald-500 via-amber-500 to-rose-500" style={{ transform: `scaleX(${0.25 + (TIMELINE_IDS.indexOf(selectedTimeline) / 4) * 0.75})` }} />
             </div>
 
             {/* Satellite Imagery Notice */}
@@ -291,6 +356,7 @@ export const WeatherSatelliteSection: React.FC = () => {
               </p>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </section>

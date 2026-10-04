@@ -1,14 +1,10 @@
-import React, { useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
+import { gsap, MQ } from './story/gsap';
 import {
   Video,
   AlertTriangle,
-  Radio,
-  Eye,
   Crosshair,
-  Compass,
   CheckCircle2,
-  Activity,
-  Layers,
 } from 'lucide-react';
 import { DataHonestyBadge } from './DataHonestyBadge';
 import ScrollHeading from './ScrollHeading';
@@ -121,9 +117,36 @@ const CAMERAS: CameraNode[] = [
 
 export const CameraNetworkSection: React.FC = () => {
   const [activeCam, setActiveCam] = useState<CameraNode>(CAMERAS[1]);
+  const mapRef = useRef<HTMLDivElement>(null);
+
+  // Camera nodes pop onto the map one by one, each with a radar ping, as the map scrolls into view.
+  useLayoutEffect(() => {
+    const el = mapRef.current;
+    if (!el) return;
+    const ctx = gsap.context(() => {
+      const mm = gsap.matchMedia();
+      const build = (scrub: boolean) => {
+        const nodes = el.querySelectorAll<SVGGElement>('[data-cam]');
+        const tl = gsap.timeline({
+          scrollTrigger: scrub
+            ? { trigger: el, start: 'top 80%', end: 'bottom 45%', scrub: 0.6 }
+            : { trigger: el, start: 'top 80%', once: true },
+        });
+        tl.from('[data-river]', { opacity: 0, duration: 0.4 });
+        nodes.forEach((n, i) => {
+          const at = 0.3 + i * 0.35;
+          tl.from(n, { scale: 0, opacity: 0, transformOrigin: '50% 50%', duration: 0.35, ease: 'back.out(2)' }, at)
+            .fromTo(n.querySelector('[data-ping]'), { attr: { r: 4 }, opacity: 0.9 }, { attr: { r: 30 }, opacity: 0, duration: 0.6, ease: 'power1.out' }, at);
+        });
+      };
+      mm.add(MQ.desktop, () => build(true));
+      mm.add(MQ.mobile, () => build(false));
+    }, el);
+    return () => ctx.revert();
+  }, []);
 
   return (
-    <section id="cameras" className="relative py-20 sm:py-28 pattern-cctv-matrix border-t border-[#262830] text-[#FAF9F6] overflow-hidden">
+    <section className="relative py-16 sm:py-24 text-[#FAF9F6] overflow-hidden">
       {/* CCTV Scanline Sweep Animation */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-25">
         <div className="w-full h-1 bg-[#D4F826] shadow-[0_0_8px_#D4F826] animate-scanline-drop" />
@@ -163,7 +186,7 @@ export const CameraNetworkSection: React.FC = () => {
             </div>
 
             {/* Stylized Node Placement Map - Tactical CCTV Frame */}
-            <div className="relative w-full aspect-[16/9] bg-[#14161C] rounded-3xl border-2 border-white/15 p-4 overflow-hidden shadow-2xl group hover:border-[#D4F826] transition-all">
+            <div ref={mapRef} className="relative w-full aspect-[16/9] glass-dark rounded-3xl border-2 border-white/15 p-4 overflow-hidden shadow-2xl group hover:border-[#D4F826] transition-all">
               {/* Background Topo Curves */}
               <div className="absolute inset-0 light-contour-lines opacity-10 pointer-events-none" />
 
@@ -174,7 +197,7 @@ export const CameraNetworkSection: React.FC = () => {
                 <path d="M 60 260 Q 220 220 380 250 T 570 230" stroke="#333845" strokeWidth="1" fill="none" strokeDasharray="3 3" />
 
                 {/* River Vector (Chaliyar Tributary) */}
-                <path d="M 120 70 Q 240 160 320 210 T 480 320" stroke="#0284c7" strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.75" />
+                <path data-river d="M 120 70 Q 240 160 320 210 T 480 320" stroke="#0284c7" strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.75" />
 
                 {/* Camera Markers */}
                 {CAMERAS.map((cam, idx) => {
@@ -192,9 +215,13 @@ export const CameraNetworkSection: React.FC = () => {
                   return (
                     <g
                       key={cam.id}
+                      data-cam
                       onClick={() => setActiveCam(cam)}
-                      className="cursor-pointer transition-transform hover:scale-125"
+                      className="cursor-pointer"
                     >
+                      {/* Radar ping when the node appears */}
+                      <circle data-ping cx={pos.cx} cy={pos.cy} r="4" fill="none" stroke="#D4F826" strokeWidth="1.5" opacity="0" />
+
                       {/* Pulse Circle for Alert */}
                       {cam.status === 'ALERT' && (
                         <circle
@@ -269,7 +296,7 @@ export const CameraNetworkSection: React.FC = () => {
           </div>
 
           {/* Active Camera Telemetry & Edge Detection Inspector (6 cols) */}
-          <div className="lg:col-span-6 bg-[#1A1C23] rounded-3xl border border-[#2E3240] p-6 space-y-5 shadow-2xl">
+          <div data-reveal className="glow-card lg:col-span-6 glass-dark rounded-3xl p-6 space-y-5 shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-white/10">
               <div className="flex items-center gap-2 font-mono">
                 <Video className="h-4 w-4 text-[#D4F826]" />
