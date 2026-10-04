@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeftRight, Compass } from 'lucide-react';
 
@@ -10,18 +10,40 @@ export const FloodComparisonViewer: React.FC<FloodComparisonViewerProps> = ({
   className = '',
 }) => {
   const navigate = useNavigate();
-  const [splitPos, setSplitPos] = useState<number>(50); // percentage 0 - 100
-  const [isHovering, setIsHovering] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const beforeRef = useRef<HTMLDivElement | null>(null);
+  const dividerRef = useRef<HTMLDivElement | null>(null);
+  const raf = useRef(0);
+  const pendingX = useRef<number | null>(null);
 
-  // Smooth hover tracking without clicking or dragging - full 0 to 100% reveal
-  const updateSplit = useCallback((clientX: number) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = clientX - rect.left;
-    const pct = Math.max(0, Math.min(100, (x / rect.width) * 100));
-    setSplitPos(pct);
+  // The split follows the pointer directly (written to the DOM on the next frame, no React re-render),
+  // so the reveal stays instant even while the rest of the page is busy animating.
+  const applySplit = useCallback((pct: number, glide: boolean) => {
+    const before = beforeRef.current;
+    const divider = dividerRef.current;
+    if (!before || !divider) return;
+    const clip = `polygon(0 0, ${pct}% 0, ${pct}% 100%, 0 100%)`;
+    before.style.transition = glide ? 'clip-path 300ms ease-out, -webkit-clip-path 300ms ease-out' : 'none';
+    divider.style.transition = glide ? 'left 300ms ease-out' : 'none';
+    before.style.clipPath = clip;
+    before.style.setProperty('-webkit-clip-path', clip);
+    divider.style.left = `${pct}%`;
   }, []);
+
+  const updateSplit = useCallback((clientX: number) => {
+    pendingX.current = clientX;
+    if (raf.current) return;
+    raf.current = requestAnimationFrame(() => {
+      raf.current = 0;
+      const el = containerRef.current;
+      const x = pendingX.current;
+      if (!el || x === null) return;
+      const rect = el.getBoundingClientRect();
+      applySplit(Math.max(0, Math.min(100, ((x - rect.left) / rect.width) * 100)), false);
+    });
+  }, [applySplit]);
+
+  useEffect(() => () => { if (raf.current) cancelAnimationFrame(raf.current); }, []);
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     updateSplit(e.clientX);
@@ -33,10 +55,11 @@ export const FloodComparisonViewer: React.FC<FloodComparisonViewerProps> = ({
     }
   }, [updateSplit]);
 
-  const handleMouseEnter = () => setIsHovering(true);
+  const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => updateSplit(e.clientX);
   const handleMouseLeave = () => {
-    setIsHovering(false);
-    setSplitPos(50); // gently glide back to center partition on mouse exit
+    if (raf.current) { cancelAnimationFrame(raf.current); raf.current = 0; }
+    pendingX.current = null;
+    applySplit(50, true); // gently glide back to center partition on mouse exit
   };
 
   // Clicking anywhere on the image navigates directly to the 3D Map
@@ -52,7 +75,7 @@ export const FloodComparisonViewer: React.FC<FloodComparisonViewerProps> = ({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onTouchMove={handleTouchMove}
-      onTouchStart={() => setIsHovering(true)}
+      onTouchStart={(e) => { if (e.touches.length > 0) updateSplit(e.touches[0].clientX); }}
       onTouchEnd={handleMouseLeave}
       role="button"
       tabIndex={0}
@@ -93,12 +116,11 @@ export const FloodComparisonViewer: React.FC<FloodComparisonViewerProps> = ({
 
       {/* LAYER 2: BEFORE FLOOD / BASELINE MAP (Hero 1 - Clipped Layer based on splitPos) */}
       <div
-        className={`absolute inset-0 w-full h-full ${
-          isHovering ? '' : 'transition-[clip-path] duration-300 ease-out'
-        }`}
+        ref={beforeRef}
+        className="absolute inset-0 w-full h-full"
         style={{
-          clipPath: `polygon(0 0, ${splitPos}% 0, ${splitPos}% 100%, 0 100%)`,
-          WebkitClipPath: `polygon(0 0, ${splitPos}% 0, ${splitPos}% 100%, 0 100%)`,
+          clipPath: 'polygon(0 0, 50% 0, 50% 100%, 0 100%)',
+          WebkitClipPath: 'polygon(0 0, 50% 0, 50% 100%, 0 100%)',
         }}
       >
         <img
@@ -130,10 +152,9 @@ export const FloodComparisonViewer: React.FC<FloodComparisonViewerProps> = ({
 
       {/* PARTITION DIVIDER BAR (Follows cursor smoothly on hover) */}
       <div
-        className={`absolute top-0 bottom-0 z-20 pointer-events-none ${
-          isHovering ? '' : 'transition-[left] duration-300 ease-out'
-        }`}
-        style={{ left: `${splitPos}%` }}
+        ref={dividerRef}
+        className="absolute top-0 bottom-0 z-20 pointer-events-none"
+        style={{ left: '50%' }}
       >
         {/* Crisp Glowing Divider Line */}
         <div className="absolute top-0 bottom-0 -left-[1.5px] w-[3px] bg-[#D4F826] shadow-[0_0_14px_#D4F826]" />
