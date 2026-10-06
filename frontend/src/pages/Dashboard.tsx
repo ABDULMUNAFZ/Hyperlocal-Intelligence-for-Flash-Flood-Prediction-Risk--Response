@@ -23,7 +23,6 @@ const Dashboard: React.FC = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <DataStatusPanel />
-          <CatalystCenterPanel />
           
           <div className="rounded-lg border p-6 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/20 dark:to-indigo-900/20">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
@@ -49,6 +48,8 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
         </div>
+
+        <CatalystCenterPanel />
 
         <div className="rounded-lg border p-6">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">

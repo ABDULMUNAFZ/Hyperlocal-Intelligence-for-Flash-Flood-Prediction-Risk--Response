@@ -1,5 +1,6 @@
 // Client for FloodGuard's Cisco Catalyst Center proxy. The browser only talks to the FloodGuard
-// backend; Catalyst Center credentials and tokens never leave the server.
+// backend; Catalyst Center credentials and tokens never leave the server. The summary endpoints used
+// here are public and aggregate-only (no management IPs).
 import { api } from './api';
 
 export interface CatalystCenterEnvelope {
@@ -12,7 +13,18 @@ export interface CatalystCenterEnvelope {
   error?: string;
 }
 
+export interface CatalystDeviceHealthItem {
+  name: string | null;
+  family: string | null;
+  location: string | null;
+  health_score: number | null;
+  status: 'healthy' | 'warning' | 'critical' | 'unknown';
+  reachability: string | null;
+  issue_count: number | null;
+}
+
 export interface CatalystDeviceHealth {
+  items: CatalystDeviceHealthItem[];
   total: number;
   healthy: number;
   warning: number;
@@ -27,7 +39,10 @@ export interface CatalystNetworkHealth {
 
 export interface CatalystSiteHealth {
   name: string | null;
+  site_type: string | null;
   network_health_score: number | null;
+  healthy_network_device_pct: number | null;
+  network_device_count: number | null;
 }
 
 export interface CatalystCenterHealth extends CatalystCenterEnvelope {
