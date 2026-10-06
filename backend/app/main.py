@@ -30,6 +30,7 @@ from app.api.v1.endpoints import (
     geo_sim,
     live,
     emergency,
+    catalyst_center,
 )
 from app.data.pipelines.iot import iot_router
 
@@ -111,6 +112,7 @@ app.include_router(emergency.push_router, prefix="/api/v1")
 app.include_router(emergency.router, prefix="/api/v1")
 app.include_router(emergency.rescue_router, prefix="/api/v1")
 app.include_router(emergency.safe_router, prefix="/api/v1")
+app.include_router(catalyst_center.router, prefix="/api/v1")  # Cisco Catalyst Center (optional, read-only)
 
 
 @app.get("/")

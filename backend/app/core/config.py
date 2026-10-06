@@ -1,7 +1,7 @@
 # FloodGuard Backend Configuration
 from functools import lru_cache
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import Field, PostgresDsn, RedisDsn, model_validator
+from pydantic import Field, PostgresDsn, RedisDsn, SecretStr, model_validator
 from typing import Optional
 
 
@@ -85,6 +85,14 @@ class Settings(BaseSettings):
     GEE_SERVICE_ACCOUNT_KEY_PATH: Optional[str] = None
     MAPTILER_KEY: Optional[str] = None
     MAPBOX_TOKEN: Optional[str] = None
+
+    # Cisco Catalyst Center (optional network-infrastructure integration; off when URL/credentials are unset).
+    # The password is a SecretStr so it never appears in reprs, logs or error messages.
+    CATALYST_CENTER_URL: Optional[str] = None
+    CATALYST_CENTER_USERNAME: Optional[str] = None
+    CATALYST_CENTER_PASSWORD: Optional[SecretStr] = None
+    CATALYST_CENTER_VERIFY_SSL: bool = True   # set false only for controllers with self-signed certificates (e.g. the DevNet sandbox)
+    CATALYST_CENTER_TIMEOUT: float = 15.0      # seconds per request
 
     # Email/SMS
     SMTP_HOST: Optional[str] = None
