@@ -250,19 +250,33 @@ async def test_outage_returns_offline_and_is_cached_briefly(configured):
     assert (await service.status())["connected"] is False
 
 
-def test_routes_require_login_and_never_leak_secrets(configured):
+def test_summary_routes_are_public_inventory_requires_login_and_nothing_leaks(configured):
     from app.api.v1.endpoints import auth as auth_endpoints
     from app.api.v1.endpoints import catalyst_center
 
     app = FastAPI()
     app.include_router(catalyst_center.router, prefix="/api/v1")
-    with TestClient(app) as http:
-        assert http.get("/api/v1/catalyst-center/status").status_code == 401
-
-    app.dependency_overrides[auth_endpoints.get_current_active_user] = lambda: object()
     use_routes({"/dna/system/api/v1/auth/token": [httpx.Response(401, text=PASSWORD)]})
     with TestClient(app) as http:
-        for path in ("status", "devices", "health", "events"):
+        assert http.get("/api/v1/catalyst-center/devices").status_code == 401
+        for path in ("status", "health", "events"):
             r = http.get(f"/api/v1/catalyst-center/{path}")
             assert r.status_code == 200 and r.json()["connected"] is False
             assert PASSWORD not in r.text and TOKEN not in r.text
+
+    app.dependency_overrides[auth_endpoints.get_current_active_user] = lambda: object()
+    with TestClient(app) as http:
+        r = http.get("/api/v1/catalyst-center/devices")
+        assert r.status_code == 200 and PASSWORD not in r.text
+
+
+@pytest.mark.asyncio
+async def test_public_health_view_has_no_management_ips(configured):
+    use_routes({
+        "/dna/system/api/v1/auth/token": [token_ok()],
+        "/dna/intent/api/v1/device-health": [httpx.Response(200, json=DEVICE_HEALTH)],
+        "/dna/intent/api/v1/network-health": [httpx.Response(200, json=NETWORK_HEALTH)],
+        "/dna/intent/api/v1/site-health": [httpx.Response(200, json=SITE_HEALTH)],
+    })
+    out = await service.health()
+    assert "10.0.0." not in json.dumps(out)

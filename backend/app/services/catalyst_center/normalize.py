@@ -93,7 +93,6 @@ def device_health(payload: Any) -> Dict[str, Any]:
         items.append(
             {
                 "name": _str(d.get("name")),
-                "ip": _str(d.get("ipAddress")),
                 "family": _str(d.get("deviceFamily")),
                 "location": _str(d.get("location")),
                 "health_score": _num(d.get("overallHealth")),
