@@ -52,6 +52,9 @@ lightgbm==4.3.0
 # jax==0.4.28
 # jaxlib==0.4.28
 
+# ML observability (optional at runtime; 7.x keeps numpy 1.x, 8.x requires numpy>=2)
+arize==7.54.0
+
 # HTTP Clients
 httpx==0.27.0
 aiohttp==3.9.5

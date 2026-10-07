@@ -262,7 +262,9 @@ class InferenceEngine:
             
             await self._increment_metric("total_requests")
             await self._add_latency(latency_ms)
-            
+
+            self._observe(features, feature_names, probas, latency_ms, model_used)
+
             return result
             
         except Exception as e:
@@ -312,7 +314,9 @@ class InferenceEngine:
             results.extend(chunk_results)
         
         latency_ms = (time.time() - start_time) * 1000
-        
+
+        self._observe(features_batch, feature_names, [r["probability"] for r in results], latency_ms, "ensemble", batch=True)
+
         return {
             "predictions": results,
             "total_samples": len(results),
@@ -320,6 +324,24 @@ class InferenceEngine:
             "timestamp": datetime.utcnow().isoformat()
         }
     
+    def _observe(self, features, feature_names, probabilities, latency_ms: float, model_used: str, batch: bool = False) -> None:
+        """Hand the finished prediction to optional model observability. Never raises, never blocks."""
+        try:
+            from app.services.model_observability.telemetry import BATCH_EXPORT_SAMPLE, telemetry
+
+            telemetry.observe(
+                features=features,
+                feature_names=feature_names,
+                probabilities=probabilities,
+                latency_ms=latency_ms,
+                model_used=model_used,
+                model_version=self._model_versions.get("flood_ensemble") or self._model_versions.get(model_used) or "unregistered",
+                risk_level_of=self._get_risk_level,
+                export_sample=BATCH_EXPORT_SAMPLE if batch else None,
+            )
+        except Exception as exc:  # noqa: BLE001 - observability must never affect a prediction
+            logger.debug(f"Model observability skipped: {type(exc).__name__}")
+
     def _predict_proba_raw(self, features: np.ndarray, use_ensemble: bool) -> np.ndarray:
         """Raw probability prediction without metrics."""
         if use_ensemble:

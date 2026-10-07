@@ -31,6 +31,7 @@ from app.api.v1.endpoints import (
     live,
     emergency,
     catalyst_center,
+    model_observability,
 )
 from app.data.pipelines.iot import iot_router
 
@@ -113,6 +114,7 @@ app.include_router(emergency.router, prefix="/api/v1")
 app.include_router(emergency.rescue_router, prefix="/api/v1")
 app.include_router(emergency.safe_router, prefix="/api/v1")
 app.include_router(catalyst_center.router, prefix="/api/v1")  # Cisco Catalyst Center (optional, read-only)
+app.include_router(model_observability.router, prefix="/api/v1")  # Model observability (optional Arize AI export)
 
 
 @app.get("/")

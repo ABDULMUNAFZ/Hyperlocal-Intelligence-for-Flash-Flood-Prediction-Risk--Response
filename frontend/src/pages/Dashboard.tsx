@@ -2,6 +2,7 @@
 import React from 'react';
 import { DataStatusPanel } from '../components/DataStatusPanel';
 import { CatalystCenterPanel } from '../components/CatalystCenterPanel';
+import { ModelObservabilityPanel } from '../components/ModelObservabilityPanel';
 import { Layout } from '../components/Layout';
 
 const Dashboard: React.FC = () => {
@@ -50,6 +51,8 @@ const Dashboard: React.FC = () => {
         </div>
 
         <CatalystCenterPanel />
+
+        <ModelObservabilityPanel />
 
         <div className="rounded-lg border p-6">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
