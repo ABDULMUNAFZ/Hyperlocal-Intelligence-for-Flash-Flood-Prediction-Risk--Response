@@ -4,7 +4,7 @@
  * Notification sound/vibration are requested but always subject to OS settings (silent mode,
  * Do Not Disturb, per-app notification settings) — a web app cannot override them.
  */
-const VERSION = 'floodguard-v1';
+const VERSION = 'floodguard-v2'; // bump when cached shell or icon files change
 const SHELL = ['/emergency', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/badge-96.png'];
 
 self.addEventListener('install', (event) => {

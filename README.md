@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="frontend/public/icons/icon-192.png" alt="FloodGuard logo" width="96" height="96" />
+<img src="frontend/public/icons/icon-512.png" alt="FloodGuard logo" width="112" height="112" />
 
 # FloodGuard
 

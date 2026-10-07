@@ -1,6 +1,7 @@
 // FloodGuard Layout Component
 import React, { useState } from 'react';
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
+import { FloodGuardLogo } from './common/FloodGuardLogo';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: '🏠' },
@@ -39,7 +40,9 @@ export const Layout: React.FC = () => {
           {/* Logo */}
           <div className="p-4 border-b border-gray-200 dark:border-gray-700">
             <h1 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              <span className="text-2xl">🌊</span>
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#181A1E]">
+                <FloodGuardLogo variant="citron" className="h-5 w-auto" />
+              </span>
               FloodGuard
             </h1>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
