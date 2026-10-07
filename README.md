@@ -38,16 +38,17 @@
 9. [Science & data](#-science--data)
 10. [Getting started (local)](#-getting-started-local)
 11. [Configuration](#-configuration)
-12. [API overview](#-api-overview)
-13. [Deployment](#-deployment)
-14. [Performance](#-performance)
-15. [Testing](#-testing)
-16. [Project structure](#-project-structure)
-17. [Limitations & honesty](#-limitations--honesty)
-18. [Roadmap](#-roadmap)
-19. [Contributing](#-contributing)
-20. [License](#-license)
-21. [Acknowledgements](#-acknowledgements)
+12. [AI Model Observability](#-ai-model-observability)
+13. [API overview](#-api-overview)
+14. [Deployment](#-deployment)
+15. [Performance](#-performance)
+16. [Testing](#-testing)
+17. [Project structure](#-project-structure)
+18. [Limitations & honesty](#-limitations--honesty)
+19. [Roadmap](#-roadmap)
+20. [Contributing](#-contributing)
+21. [License](#-license)
+22. [Acknowledgements](#-acknowledgements)
 
 ---
 
@@ -419,6 +420,66 @@ Copy [`.env.example`](.env.example) to `.env`. The most important settings:
 
 ---
 
+## 🧠 AI Model Observability
+
+FloodGuard can optionally stream its flood-risk predictions to **[Arize AI](https://arize.com/)** so the model can be watched in production: what it is fed, what it predicts, how fast, and whether the inputs drift away from what it was trained on. It is **monitoring only**. It never changes a prediction, and FloodGuard works the same with it off, misconfigured or unreachable.
+
+**What is monitored.** Each prediction from `InferenceEngine.predict` / `predict_batch` (the single path behind `/prediction/predict`, zone risk, risk signs and scenarios):
+
+| Sent to Arize | Detail |
+|---|---|
+| Features | the 17 model inputs (rainfall 1/6/24/72 h, weather, elevation, slope, TWI, soil, land cover, population density, historical flood count) |
+| Prediction | flood probability (score) and `flood` / `no_flood` label at 0.5 |
+| Tags | risk level, inference latency (ms), model used, deployment environment |
+| Model | `ARIZE_MODEL_ID`, registered model version, binary classification, production environment |
+
+Drift, distributions and performance are **computed by Arize monitors**. The dashboard links to them and does not re-create them.
+
+**Architecture.**
+
+```
+prediction request ─▶ InferenceEngine.predict() ─▶ response (unchanged)
+                              │ after the result is built; never raises
+                              ▼
+                  in-memory buffer (bounded, 5 000 rows)
+                              │ background task every 10 s
+                ┌─────────────┴──────────────┐
+                ▼                            ▼
+   Redis daily counters            Arize SDK (worker thread, timeout)
+   (dashboard stats)               batch ≤ 1 000 rows; batch jobs sampled to 200
+                ▼
+   GET /api/v1/model-observability/summary ─▶ "AI Model Intelligence" dashboard panel
+```
+
+Exports run off the request path. Arize errors (timeout, unreachable, 401/403, 404, 429, 5xx, SDK missing) are caught, logged by type only, and shown on the panel as *Arize AI temporarily unavailable*. A 429 pauses exports for 60 s.
+
+**Enabling.** Create a space in Arize, then set these **on the backend only** (local `backend/.env`, or AWS Secrets Manager in production):
+
+| Variable | Purpose | Default |
+|---|---|---|
+| `ARIZE_ENABLED` | Turn exports on | `false` |
+| `ARIZE_API_KEY` | Arize API key (secret) | — |
+| `ARIZE_SPACE_ID` | Arize space ID | — |
+| `ARIZE_MODEL_ID` | Model name in Arize | `FloodGuard-Risk-Prediction` |
+| `ARIZE_TIMEOUT` | Per-export timeout (seconds) | `10` |
+
+> 🔒 Never put Arize keys in `VITE_*` variables, the frontend, the repo or a Docker image. The browser only ever sees aggregate counts and connection state.
+
+**Running without Arize.** Leave `ARIZE_ENABLED=false` (the default). Predictions, stats and the panel keep working, and the panel shows *Arize AI not connected* with a connect prompt.
+
+**Privacy.** Only model inputs and outputs are sent. No names, phone numbers, emails, tokens, user IDs or coordinates/addresses. Prediction IDs are random UUIDs.
+
+**Limitations.**
+- **No ground truth yet.** Observed flood outcomes are not logged as actuals, so Arize shows drift and prediction distributions, not accuracy. Nothing is fabricated. Next step: return the prediction ID to clients and log verified outcomes against it.
+- Location is deliberately not sent, so Arize cannot slice drift by region.
+- Batch jobs (zone grids, scenarios) are fully counted but sampled to 200 rows per batch for export.
+- Pinned to `arize==7.54.0`: Arize 8.x requires NumPy 2, and the backend pins NumPy 1.26.
+- The model is still trained on synthetic data (see [Limitations & honesty](#-limitations--honesty)). Observability shows how it behaves; it does not validate it.
+
+Tests: `cd backend && pytest tests/test_model_observability.py` (Arize is mocked; no account needed).
+
+---
+
 ## 🔌 API overview
 
 Full, interactive reference: **https://api.techmavericks.me/docs**
@@ -438,6 +499,7 @@ Full, interactive reference: **https://api.techmavericks.me/docs**
 | Evacuation | `POST /evacuation/safe-route` · `/evacuation/routes/compute` · `GET /evacuation/shelters/nearby` | public |
 | AI assistant | `POST /geo/assistant` · `POST /ai/chat` | public |
 | History & data | `GET /geo/historical-events` · `/historical-floods/nearby` · `/data-sources/status` | public |
+| Model observability | `GET /model-observability/summary` (aggregate stats + Arize AI state) | public |
 | IoT sensors | `POST /iot/register` · `POST /iot/observations` · `GET /iot/readings/latest` | sensor / responders |
 | Auth | `POST /auth/register` · `POST /auth/login` · `POST /auth/refresh` · `GET /auth/me` | public |
 

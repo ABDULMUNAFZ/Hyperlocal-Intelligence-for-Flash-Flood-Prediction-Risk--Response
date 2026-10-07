@@ -94,6 +94,14 @@ class Settings(BaseSettings):
     CATALYST_CENTER_VERIFY_SSL: bool = True   # set false only for controllers with self-signed certificates (e.g. the DevNet sandbox)
     CATALYST_CENTER_TIMEOUT: float = 15.0      # seconds per request
 
+    # Arize AI model observability (optional). Prediction never depends on it: when disabled, unconfigured
+    # or unreachable, inference results are returned exactly as before and export failures are only logged.
+    ARIZE_ENABLED: bool = False
+    ARIZE_API_KEY: Optional[SecretStr] = None
+    ARIZE_SPACE_ID: Optional[str] = None
+    ARIZE_MODEL_ID: str = "FloodGuard-Risk-Prediction"
+    ARIZE_TIMEOUT: float = 10.0  # seconds per export request
+
     # Email/SMS
     SMTP_HOST: Optional[str] = None
     SMTP_PORT: int = 587
