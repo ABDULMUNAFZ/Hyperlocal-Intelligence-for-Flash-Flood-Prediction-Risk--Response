@@ -1,7 +1,7 @@
 // FloodGuard Frontend - Data Status Panel Component
 // Shows real-time status of all data sources
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../services/api';
 
@@ -26,7 +26,7 @@ export const DataStatusPanel: React.FC<DataStatusPanelProps> = ({
   const { data, isLoading, error, refetch } = useQuery<DataSourceStatus[]>({
     queryKey: ['dataStatus'],
     queryFn: async () => {
-      const response = await api.get('/api/v1/data-sources/status');
+      const response = await api.get('/data-sources/status');
       return response.data;
     },
     refetchInterval: 60000, // Refresh every minute
@@ -119,6 +119,41 @@ export const DataStatusPanel: React.FC<DataStatusPanelProps> = ({
 
   const sources = data || [];
 
+  if (compact) {
+    const live = sources.filter((s) => s.status === 'fresh').length;
+    return (
+      <section className={`rounded-2xl border bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-900 ${className}`} aria-labelledby="data-status-title">
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <div>
+            <h2 id="data-status-title" className="text-lg font-semibold text-gray-900 dark:text-white">Data sources</h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{live} of {sources.length} sources live</p>
+          </div>
+          <button onClick={() => refetch()} className="text-sm text-blue-600 hover:underline dark:text-blue-400">Refresh</button>
+        </div>
+        <ul className="divide-y dark:divide-gray-700">
+          {Object.entries(sourceGroups).map(([groupKey, sourceNames]) => {
+            const group = sources.filter((s) => sourceNames.includes(s.source));
+            if (group.length === 0) return null;
+            const fresh = group.filter((s) => s.status === 'fresh').length;
+            const issues = group.filter((s) => s.status !== 'fresh' && s.status !== 'unavailable').length;
+            const state: DataSourceStatus['status'] = fresh > 0 ? 'fresh' : issues > 0 ? 'stale' : 'unavailable';
+            return (
+              <li key={groupKey} className="flex items-center justify-between gap-3 py-2.5 text-sm">
+                <span className="text-gray-700 dark:text-gray-300">{groupLabels[groupKey] || groupKey}</span>
+                <span className="flex items-center gap-3">
+                  <span className="font-mono text-xs text-gray-500 dark:text-gray-400">{fresh}/{group.length} live</span>
+                  <span className={`${statusColors[state]} whitespace-nowrap rounded px-2 py-0.5 text-xs font-medium`}>
+                    {statusIcons[state]} {fresh > 0 ? 'LIVE' : issues > 0 ? 'ISSUES' : 'OFFLINE'}
+                  </span>
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+    );
+  }
+
   return (
     <div className={`rounded-lg border p-4 ${className}`}>
       <div className="flex items-center justify-between mb-4">
@@ -162,9 +197,9 @@ export const DataStatusPanel: React.FC<DataStatusPanelProps> = ({
                     'border-gray-200 bg-gray-50 dark:bg-gray-800/50'
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-mono text-sm">{source.source}</span>
-                    <span className={`${statusColors[source.status]} px-2 py-0.5 rounded text-xs font-medium`}>
+                  <div className="flex flex-wrap items-center justify-between gap-1 mb-1">
+                    <span className="font-mono text-sm break-all">{source.source}</span>
+                    <span className={`${statusColors[source.status]} whitespace-nowrap px-2 py-0.5 rounded text-xs font-medium`}>
                       {statusIcons[source.status]} {statusLabels[source.status]}
                     </span>
                   </div>
