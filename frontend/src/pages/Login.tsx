@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { api } from '../services/api';
+import { FloodGuardLogo } from '../components/common/FloodGuardLogo';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -43,8 +44,8 @@ const Login: React.FC = () => {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-blue-600 mb-4">
-            <span className="text-3xl">🌊</span>
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#181A1E] mb-4">
+            <FloodGuardLogo variant="citron" className="h-9 w-auto" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">FloodGuard</h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
