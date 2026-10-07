@@ -1,6 +1,6 @@
 // FloodGuard Main App Component
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Layout } from './components/Layout';
 import FloodGuardLoader from './components/FloodGuardLoader';
@@ -9,7 +9,6 @@ import { CommandCenterErrorBoundary } from './components/Wayanad/ErrorBoundary';
 // Lazy load heavy operational pages for optimal initial bundle splitting
 const WayanadCommandCenter = lazy(() => import('./pages/WayanadCommandCenter'));
 const ProductionRoadmap = lazy(() => import('./pages/ProductionRoadmap'));
-const AdminPage = lazy(() => import('./pages/AdminPage'));
 const CommandCenter = lazy(() => import('./pages/CommandCenter'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Map3D = lazy(() => import('./pages/Map3D'));
@@ -67,9 +66,9 @@ const App: React.FC = () => {
             <Route path="/production" element={<ProductionRoadmap />} />
             <Route path="/roadmap" element={<ProductionRoadmap />} />
 
-            {/* 4. Admin Response Center */}
-            <Route path="/app/admin" element={<AdminPage />} />
-            <Route path="/admin" element={<AdminPage />} />
+            {/* 4. Admin Response Center (merged into the command dashboard) */}
+            <Route path="/app/admin" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/admin" element={<Navigate to="/dashboard" replace />} />
 
             {/* 5. Citizen Emergency App (Installable PWA) */}
             <Route path="/app/emergency" element={<EmergencyApp />} />

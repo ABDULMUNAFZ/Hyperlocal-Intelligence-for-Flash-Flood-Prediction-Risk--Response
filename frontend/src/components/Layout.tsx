@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: '🏠' },
+  { name: 'Dashboard', href: '/dashboard', icon: '🏠' },
   { name: '3D Map', href: '/map', icon: '🗺️' },
   { name: 'Risk Analysis', href: '/risk', icon: '📊' },
   { name: 'Simulations', href: '/simulations', icon: '🌊' },
@@ -136,7 +136,7 @@ export const Layout: React.FC = () => {
 
 function getPageTitle(pathname: string): string {
   const titles: Record<string, string> = {
-    '/': 'Dashboard',
+    '/dashboard': 'Dashboard',
     '/map': '3D South India Map',
     '/risk': 'Risk Analysis',
     '/simulations': 'Flood Simulations',
