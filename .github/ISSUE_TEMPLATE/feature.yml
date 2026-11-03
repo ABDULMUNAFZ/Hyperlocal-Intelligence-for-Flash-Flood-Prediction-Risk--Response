@@ -1,0 +1,50 @@
+name: Feature proposal
+description: Propose a focused, evidence-based improvement
+title: "[Feature]: "
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Explain the user need before proposing a solution. Features affecting warnings, risk scores, evacuation, or rescue must state their evidence and failure modes.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Who is affected, in what situation, and what cannot they do today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+  - type: dropdown
+    id: evidence
+    attributes:
+      label: Evidence category
+      options:
+        - Official standard or government source
+        - Peer-reviewed or technical source
+        - User research or operational feedback
+        - Engineering / maintenance improvement
+        - Exploratory idea requiring validation
+    validations:
+      required: true
+  - type: textarea
+    id: safety
+    attributes:
+      label: Safety, privacy, and failure modes
+      description: Describe potential harm, misleading output, privacy impact, and fallback behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: textarea
+    id: sources
+    attributes:
+      label: Supporting sources
+      description: Link standards, research, designs, or comparable implementations.

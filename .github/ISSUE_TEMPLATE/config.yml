@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/ABDULMUNAFZ/Hyperlocal-Intelligence-for-Flash-Flood-Prediction-Risk--Response/security/advisories/new
+    about: Privately report a suspected vulnerability. Do not open a public issue.
+  - name: Emergency help in India
+    url: https://112.gov.in/
+    about: FloodGuard is not an emergency service. Call 112 and follow official authorities.
