@@ -627,6 +627,10 @@ floodguard/
 
 Please keep the project's core rule: **never fabricate data** — anything simulated, demo or unvalidated must be labelled as such.
 
+Use the structured issue forms for reproducible bugs and evidence-based feature
+proposals. Please report suspected vulnerabilities privately according to the
+[security policy](SECURITY.md), never in a public issue.
+
 ---
 
 ## 📄 License

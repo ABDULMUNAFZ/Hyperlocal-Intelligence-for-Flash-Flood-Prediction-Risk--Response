@@ -1,0 +1,72 @@
+name: Bug report
+description: Report a reproducible problem that does not expose a vulnerability
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve FloodGuard. **Do not include secrets, personal data, real emergency information, or security vulnerabilities.** Report vulnerabilities privately using `SECURITY.md`.
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      options:
+        - Citizen PWA
+        - Command center / map
+        - Responder console
+        - API / backend
+        - Data ingestion or model
+        - Deployment / documentation
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the observed behavior using synthetic or redacted data.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      placeholder: |
+        1. Start the local stack with ...
+        2. Open ...
+        3. Select ...
+        4. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: input
+    id: revision
+    attributes:
+      label: Commit or version
+      placeholder: Commit SHA or branch name
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, browser, runtime versions, and local or demo deployment.
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs
+      description: Remove tokens, contact details, coordinates, and other personal data.
+      render: shell
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety checks
+      options:
+        - label: I used synthetic or redacted data and included no secrets or personal information.
+          required: true
+        - label: This is not a security vulnerability or an active emergency.
+          required: true
